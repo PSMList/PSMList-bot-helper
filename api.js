@@ -99,7 +99,14 @@ function formatExactRegex(regex) {
  */
 
 ship.get('/', (req, res) => {
-	res.json({error: 'Not available!'});
+	poolQuery("SELECT s.*, e.short as extensionname, f.nameimg as factionimg FROM ship as s INNER JOIN (SELECT id, short FROM extension) as e ON e.id = s.idextension INNER JOIN (SELECT id, nameimg FROM faction) as f ON f.id = s.idfaction;")
+	.then( results => {
+		res.json(results);
+	})
+	.catch( err => {
+		console.trace(err);
+		res.json({error: err});
+	});
 });
 
 ship.get('/id/:ship', (req, res) => {
@@ -201,7 +208,14 @@ fort.get('/name/:fort', (req, res) => {
  */
 
 crew.get('/', (req, res) => {
-	res.json({error: 'Not available!'});
+	poolQuery("SELECT c.*, e.short as extensionname, f.nameimg as factionimg FROM crew as c INNER JOIN (SELECT id, short FROM extension) as e ON e.id = c.idextension INNER JOIN (SELECT id, nameimg FROM faction) as f ON f.id = c.idfaction;")
+	.then( results => {
+		res.json(results);
+	})
+	.catch( err => {
+		console.trace(err);
+		res.json({error: err});
+	});
 });
 
 crew.get('/id/:crew', (req, res) => {
