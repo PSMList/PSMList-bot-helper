@@ -1,16 +1,8 @@
-/*
- *
- * Discord bot - PSMList helper
- *
- * Authors : DodoDye and Arshellan
- *
- */
-
-const express = require('express'),
-			cors = require('cors')
-      app = express(),
-      mysql = require('mysql'),
-      dbConfig = require('./secret').db;
+import express from 'express';
+import cors from 'cors';
+import mysql from 'mysql';
+import fetch from 'node-fetch';
+import { db as dbConfig } from './secret.js';
 
 const pool = mysql.createPool({
     connectionLimit : 20,
@@ -28,7 +20,7 @@ pool.getConnection( err => {
 	}
 });
 
-function poolQuery(query, args){
+function poolQuery(query, args) {
 	return new Promise((resolve, reject) => {
 		pool.query(query, args, (err, results, fields) => {
 			if (!err) {
@@ -41,11 +33,12 @@ function poolQuery(query, args){
 	});
 }
 
-let extensions, extensionsRegex;
-require('./utils').loadData('extension').then( imports => {
-	extensions = imports;
+let extensionsData, extensionsRegex;
+fetch('http://localhost:8080/api/extension')
+.then( res => res.json() )
+.then( extensionsData => {
     const extensionShorts = [];
-    Object.values(extensions).forEach((extension) => {
+    Object.values(extensionsData).forEach((extension) => {
     	extensionShorts.push(extension.short)
 		if (extension.shortcommunity) {
 			extensionShorts.push(extension.shortcommunity)
@@ -60,6 +53,9 @@ require('./utils').loadData('extension').then( imports => {
 		) +
 	')';
 });
+
+
+const app = express();
 
 app.use(cors())
 
@@ -94,12 +90,16 @@ function formatExactRegex(regex) {
 	return regex;
 }
 
+function allItemsQuery(type) {
+	return `SELECT i.*, e.short as extensionname, f.nameimg as factionimg FROM ${type} as i INNER JOIN (SELECT id, short FROM extension) as e ON e.id = i.idextension INNER JOIN (SELECT id, nameimg FROM faction) as f ON f.id = i.idfaction;`
+}
+
 /*
  * /ship
  */
 
 ship.get('/', (req, res) => {
-	poolQuery("SELECT s.*, e.short as extensionname, f.nameimg as factionimg FROM ship as s INNER JOIN (SELECT id, short FROM extension) as e ON e.id = s.idextension INNER JOIN (SELECT id, nameimg FROM faction) as f ON f.id = s.idfaction;")
+	poolQuery(allItemsQuery("ship"))
 	.then( results => {
 		res.json(results);
 	})
@@ -208,7 +208,7 @@ fort.get('/name/:fort', (req, res) => {
  */
 
 crew.get('/', (req, res) => {
-	poolQuery("SELECT c.*, e.short as extensionname, f.nameimg as factionimg FROM crew as c INNER JOIN (SELECT id, short FROM extension) as e ON e.id = c.idextension INNER JOIN (SELECT id, nameimg FROM faction) as f ON f.id = c.idfaction;")
+	poolQuery(allItemsQuery("crew"))
 	.then( results => {
 		res.json(results);
 	})
@@ -276,7 +276,6 @@ treasure.get('/id/:treasure', (req, res) => {
 	}
 
 	const parts = treasureID.match(extensionsRegex + '?([^-]+-)?(.+)');
-	// console.log(parts);
 
 	const extensionShort = parts[1], prefix = parts[2], numID = parts[3];
 
@@ -469,7 +468,7 @@ api.get('/rarity', (req, res) => {
 });
 
 api.get('*', (req, res) => {
-	res.json({});
+	res.status(404).json({});
 });
 
 app.listen(8080, () => {

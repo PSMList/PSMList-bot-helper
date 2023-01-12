@@ -1,12 +1,20 @@
 # exclude anything by default
-**/*
+*
 
 # allow specific files
-api.js
-bot_icon.png
-bot.js
-config.js
-items.js
-package.json
-README.md
-utils.js
+!api.js
+!bot.js
+!config.js
+!.gitignore
+!package*.json
+!README.md
+
+# allow specifi directories
+!/commons/
+!/commons/**/*
+!/events/
+!/events/**/*
+!/interactions/
+!/interactions/**/*
+!/messages/
+!/messages/**/*
