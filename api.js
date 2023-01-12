@@ -2,7 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import mysql from 'mysql';
 import fetch from 'node-fetch';
-import { db as dbConfig } from './secret.js';
+import { DB as dbConfig } from './secret.js';
+import { API_PORT, API_URI } from './config.js';
 
 const pool = mysql.createPool({
     connectionLimit : 20,
@@ -34,7 +35,7 @@ function poolQuery(query, args) {
 }
 
 let extensionsData, extensionsRegex;
-fetch('http://localhost:8080/api/extension')
+fetch(`${API_URI}/extension`)
 .then( res => res.json() )
 .then( extensionsData => {
     const extensionShorts = [];
@@ -471,8 +472,8 @@ api.get('*', (req, res) => {
 	res.status(404).json({});
 });
 
-app.listen(8080, () => {
-    console.log('API is running on port 8080');
+app.listen(API_PORT, () => {
+    console.log(`API is running on port ${API_PORT}`);
 });
 
 process.on('exit', () => pool.end( err => {

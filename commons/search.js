@@ -1,4 +1,4 @@
-import { apiURI, emojis } from '../config.js';
+import { API_URI, emojis } from '../config.js';
 import dbData, { tables } from '../src/dbdata.js';
 import fetch from 'node-fetch';
 
@@ -262,7 +262,7 @@ async function getApiData(command, type, query) {
             getApiData(command, type, query)
         ))
         :
-        await fetch(`${apiURI}/${type}/${command}/${query}`).then(res => res.json());
+        await fetch(`${API_URI}/${type}/${command}/${query}`).then(res => res.json());
 }
 
 export default async function search(command, type, query) {

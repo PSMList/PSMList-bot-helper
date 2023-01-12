@@ -1,10 +1,10 @@
 import fetch from 'node-fetch';
-import { apiURI } from '../config.js';
+import { API_URI } from '../config.js';
 
 async function loadData(type) {
     const exports = {};
 
-    const data = await fetch(`${apiURI}/${type}`).then(res => res.json()); // expected to throw error and quit process if api is unreachable
+    const data = await fetch(`${API_URI}/${type}`).then(res => res.json()); // expected to throw error and quit process if api is unreachable
 
     if (!data) {
         return;

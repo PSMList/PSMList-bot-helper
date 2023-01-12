@@ -1,4 +1,5 @@
-export const apiURI = "http://localhost:8080/api";
+export const API_PORT = "8080";
+export const API_URI = `http://localhost${API_PORT ? ':' + API_PORT : ''}/api`;
 
 export const prefix = "psm ";
 
