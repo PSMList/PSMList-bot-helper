@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import list from '../commons/list.js';
-import { tables } from '../src/dbdata.js';
+import { tables } from '../commons/dbdata.js';
 
 export const data =
 	new SlashCommandBuilder()

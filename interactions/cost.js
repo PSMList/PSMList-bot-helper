@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import cost from '../commons/cost.js';
-import { sanitize } from '../src/utils.js';
+import { sanitize } from '../commons/utils.js';
 
 export const data =
 	new SlashCommandBuilder()

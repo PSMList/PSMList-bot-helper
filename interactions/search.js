@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import search, { types } from '../commons/search.js';
-import { replyWithEmbeds, sanitize } from '../src/utils.js';
+import { replyWithEmbeds, sanitize } from '../commons/utils.js';
 
 function setSearchByType(subcommand, command) {
     return subcommand

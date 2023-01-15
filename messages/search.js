@@ -1,6 +1,6 @@
 import search from '../commons/search.js';
 import { prefix } from '../config.js';
-import { replyWithEmbeds } from '../src/utils.js';
+import { replyWithEmbeds } from '../commons/utils.js';
 
 export default async function(message, command, searchType, args) {
     let input = '';

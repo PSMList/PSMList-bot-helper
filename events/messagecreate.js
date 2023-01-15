@@ -5,7 +5,7 @@ import help from '../messages/help.js';
 import list from '../messages/list.js';
 import ping from '../messages/ping.js';
 import search from '../messages/search.js';
-import { replyWithEmbeds, sanitize } from '../src/utils.js';
+import { replyWithEmbeds, sanitize } from '../commons/utils.js';
 
 export const name = Events.MessageCreate;
 export const once = false;

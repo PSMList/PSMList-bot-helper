@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import help from '../commons/help.js';
-import { replyWithEmbeds } from '../src/utils.js';
+import { replyWithEmbeds } from '../commons/utils.js';
 
 const choices = [
     { name: 'Cost', value: 'cost' },

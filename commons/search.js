@@ -1,5 +1,5 @@
 import { API_URI, emojis } from '../config.js';
-import dbData, { tables } from '../src/dbdata.js';
+import dbData, { tables } from '../commons/dbdata.js';
 import fetch from 'node-fetch';
 
 export const types = {

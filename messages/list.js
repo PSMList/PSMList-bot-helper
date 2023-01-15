@@ -1,5 +1,5 @@
 import list from '../commons/list.js';
-import { replyWithEmbeds } from '../src/utils.js';
+import { replyWithEmbeds } from '../commons/utils.js';
 
 const typesMap = {
     extensions: 'extension',

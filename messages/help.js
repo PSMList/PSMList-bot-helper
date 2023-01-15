@@ -1,6 +1,6 @@
 import help from '../commons/help.js';
 import { prefix } from '../config.js';
-import { replyWithEmbeds } from '../src/utils.js';
+import { replyWithEmbeds } from '../commons/utils.js';
 
 export default function(message, command) {
 

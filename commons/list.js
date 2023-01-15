@@ -1,5 +1,5 @@
 import { emojis } from '../config.js';
-import dbData, { tables, dbDataPromise } from '../src/dbdata.js';
+import dbData, { tables, dbDataPromise } from '../commons/dbdata.js';
 
 const embeds = {};
 
