@@ -23,7 +23,7 @@ function setSearchByType(subcommand, command) {
                         'Type an ID, an extension, both or a part of it (ex: "FS", "10", "FS010")'
                 )
                 .setRequired(true)
-                .setMinLength(3)
+                .setMinLength(command === 'name' ? 3 : 0)
         )
 }
 
