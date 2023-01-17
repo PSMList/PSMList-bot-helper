@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import ping from '../commons/ping.js';
+import { replyWithEmbeds } from '../commons/utils.js';
 
 export const data =
     new SlashCommandBuilder()
