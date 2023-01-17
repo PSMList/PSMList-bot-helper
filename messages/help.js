@@ -4,7 +4,7 @@ import { replyWithEmbeds } from '../commons/utils.js';
 
 export default function(message, command) {
 
-    const embed = help(command, prefix);
+    const embed = help(command || 'help', prefix);
 
     const reply = replyWithEmbeds(embed);
     message.channel.send(

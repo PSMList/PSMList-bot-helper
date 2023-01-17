@@ -1,3 +1,5 @@
+import { capitalize } from "./utils.js";
+
 const indentation = '\u200b . \u200b ';
 
 function allHelp(prefix) {
@@ -23,7 +25,7 @@ function allHelp(prefix) {
 
 export default function(command, prefix) {
     let helpMessage = '';
-    let helpTitle = `${command.charAt(0).toUpperCase()}${command.slice(1)} help`;
+    let helpTitle = `${capitalize(command)} help`;
 
     switch (command) {
         case 'search':
@@ -62,9 +64,9 @@ export default function(command, prefix) {
         case 'keyword':
             helpMessage =
                 `
-                    \`${prefix} keyword name <name>\`: Shows the effect of the keyword
-                    \`${prefix} keyword categories\`: List of keyword categories
-                    \`${prefix} keyword targets\`: List of keyword targets
+                    \`${prefix}keyword name <name>\`: Shows the effect of the keyword
+                    \`${prefix}keyword categories\`: List of keyword categories
+                    \`${prefix}keyword targets\`: List of keyword targets
                 `;
             break;
         case 'treasure':
