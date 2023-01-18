@@ -22,11 +22,21 @@ export function replyWithEmbeds(embeds) {
                         embed.fields[0].name
                         :
                         null
-            console.error(`Too many results${title ? ` for: ${title}` : ''}`);
-            filteredEmbeds.push({
-                title: `${title ? `${title}: ` : ''}Too many results`,
-                description: 'Results contains too much lines to be displayed, please refine your search terms.'
-            });
+
+            if (embed.title) {
+                console.trace(`Too long response${title ? ` for: ${title}` : ''}`);
+                filteredEmbeds.push({
+                    title: `${title ? `${title}: ` : ''}too long response`,
+                    description: 'Please contact bot administrators.'
+                });
+            }
+            else {
+                console.trace(`Too many results${title ? ` for: ${title}` : ''}`);
+                filteredEmbeds.push({
+                    title: `${title ? `${title}: ` : ''}too many results`,
+                    description: 'Results contains too much lines to be displayed, please refine your search terms.'
+                });
+            }
         }
     }
 
