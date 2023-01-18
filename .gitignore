@@ -10,12 +10,12 @@
 !README.md
 !deploy-commands.js
 
-# allow specifi directories
+# allow specific directories
 !/commons/
-!/commons/**/*
+!/commons/**/*.js
 !/events/
-!/events/**/*
+!/events/**/*.js
 !/interactions/
-!/interactions/**/*
+!/interactions/**/*.js
 !/messages/
-!/messages/**/*
+!/messages/**/*.js
