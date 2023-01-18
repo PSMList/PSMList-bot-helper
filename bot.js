@@ -1,3 +1,4 @@
+import './api.js';
 import * as commands from './interactions/index.js';
 import * as events from './events/index.js';
 
