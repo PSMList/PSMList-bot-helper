@@ -35,7 +35,7 @@ function buildItemEmbed(type, data) {
                 title: item.shortname,
                 url: `https://www.psmlist.com/public/keyword/detail?kw=${encodeURI(item.shortname)}`,
                 fields: [
-                    { name: 'Cost', value: item.cost, inline: true },
+                    { name: 'Cost', value: item.cost.toString(), inline: true },
                     { name: 'Category', value: dbData[tables[3]][item.idkeywordtype].name, inline: true },
                     { name: 'Target', value: dbData[tables[4]][item.idkeywordtarget].name, inline: true },
                     { name: 'Effect', value: item.effect }
