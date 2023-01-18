@@ -24,21 +24,32 @@ export const types = {
     }
 }
 
+function truncateField(text, moreUrl) {
+    const defaultText = text || '-';
+    const trimmedText = defaultText.length < 300 ?
+    defaultText
+        :
+        `${defaultText.slice(0, 300)}... [See complete description](${moreUrl})`;
+
+    return trimmedText;
+}
+
 function buildItemEmbed(type, data) {
 
     const embeds = [];
 
     if (type === 'keyword') {
         const item = data[0];
+        const url = `https://www.psmlist.com/public/keyword/detail?kw=${encodeURI(item.shortname)}`;
         embeds.push(
             {
                 title: item.shortname,
-                url: `https://www.psmlist.com/public/keyword/detail?kw=${encodeURI(item.shortname)}`,
+                url,
                 fields: [
                     { name: 'Cost', value: item.cost.toString(), inline: true },
                     { name: 'Category', value: dbData[tables[3]][item.idkeywordtype].name, inline: true },
                     { name: 'Target', value: dbData[tables[4]][item.idkeywordtarget].name, inline: true },
-                    { name: 'Effect', value: item.effect }
+                    { name: 'Effect', value: truncateField(item.effect, url) }
                 ]
             }
         );
@@ -56,14 +67,19 @@ function buildItemEmbed(type, data) {
             type = 'ship';
         }
 
+        const url = `https://psmlist.com/public/${type}/${itemID}`;
+
         const itemEmbed = {
             title: `${item.name} (${itemID})`,
             color: parseInt(dbData[tables[2]][item.idrarity].colorhex, 16),
-            url: `https://psmlist.com/public/${type}/${itemID}`,
+            url,
             image: { url: `https://psmlist.com/public/img/gameicons/full/${extensionObject.short}/${item.numid}.jpg` }
         }
 
         const fields = [];
+
+        const defaultAptitude = truncateField(item.defaultaptitude, url);
+        const defaultLore = truncateField(item.defaultlore, url);
 
         switch (type) {
             case 'ship':
@@ -74,8 +90,8 @@ function buildItemEmbed(type, data) {
                             value: '**' + item.points + ' points** \u200b \u200b ' +
                                 emojis.cannon + '\ ' + item.cannons.match(/\w{2}/g).reduce((cannons, cannon) => cannons + ' \u200b ' + emojis[cannon], ''),
                         },
-                        { name: 'Ability', value: item.defaultaptitude || '-', inline: true },
-                        { name: 'Flavor Text', value: item.defaultlore || '-', inline: true }
+                        { name: 'Ability', value: defaultAptitude, inline: true },
+                        { name: 'Flavor Text', value: defaultLore, inline: true }
                     );
                 }
                 else {
@@ -88,8 +104,8 @@ function buildItemEmbed(type, data) {
                                 emojis.speed + ' ' + item.basemove + ' \u200b \u200b ' +
                                 emojis.cannon + ' ' + item.cannons.match(/\w{2}/g).reduce((cannons, cannon) => cannons + ' \u200b ' + emojis[cannon], ''),
                         },
-                        { name: 'Ability', value: item.defaultaptitude || '-', inline: true },
-                        { name: 'Flavor Text', value: item.defaultlore || '-', inline: true }
+                        { name: 'Ability', value: defaultAptitude, inline: true },
+                        { name: 'Flavor Text', value: defaultLore, inline: true }
                     );
                 }
                 break;
@@ -99,15 +115,15 @@ function buildItemEmbed(type, data) {
                         name: emojis[extensionObject.short] + ' \u200b ' + extensionObject.name + ' \u200b - \u200b ' + extensionObject.short + ' \u200b \u200b \u200b ' + emojis[faction.nameimg] + ' \u200b ' + faction.name,
                         value: '**' + item.points + ' points**',
                     },
-                    { name: 'Ability', value: item.defaultaptitude || '-', inline: true },
-                    { name: 'Flavor Text', value: item.defaultlore || '-', inline: true },
+                    { name: 'Ability', value: defaultAptitude, inline: true },
+                    { name: 'Flavor Text', value: defaultLore, inline: true },
                 );
                 break;
             case 'treasure':
                 fields.push(
                     {
                         name: emojis[extensionObject.short] + ' \u200b ' + extensionObject.name + ' \u200b - \u200b ' + extensionObject.short,
-                        value: item.defaultaptitude || '-'
+                        value: defaultAptitude
                     }
                 );
                 break;
