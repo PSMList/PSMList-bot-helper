@@ -152,27 +152,25 @@ function buildItemsEmbed(type, items) {
             output = items.slice(i, i + 8).reduce((accu, item) => {
                 const faction = dbData[tables[0]][item.idfaction];
                 const extensionObject = dbData[tables[1]][item.idextension];
-                return accu +
-                    ' \u200b \u200b ' + '[' + extensionObject.short + item.numid + '](https://psmlist.com/public/' + (type !== 'fort' ? type : 'ship') + '/' + extensionObject.short + item.numid + ')' +
-                    (faction && faction.nameimg ? ' \u200b ' + emojis[faction.nameimg] : '') +
-                    ' \u200b\ ' + item.name +
-                    '\n';
+                const url = `https://psmlist.com/public/${(type !== 'fort' ? type : 'ship')}/${extensionObject.short}${item.numid}`;
+                const nameAndFaction = `${(faction && faction.nameimg ? ' \u200b ' + emojis[faction.nameimg] : '')} \u200b ${item.name}`;
+    
+                return `${accu}[${extensionObject.short}${item.numid}](${url})${nameAndFaction}\n`;
             }, '');
         }
         else {
-            output = items.slice(i, i + 8).reduce((accu, item) =>
-                accu + ' \u200b \u200b ' + '[' + item.shortname + '](https://www.psmlist.com/public/keyword/detail?kw=' + encodeURI(item.shortname) + ') \n'
-                , '');
+            output = items.slice(i, i + 8).reduce((accu, item) => {
+                const url = `https://www.psmlist.com/public/keyword/detail?kw=${encodeURI(item.shortname)}`;
+                return `${accu}[${item.shortname}](${url})\n`;
+            }, '');
         }
         fields.push({ name: title, value: output, inline: true });
         title = ' \u200b';
     }
 
-    return [
-        {
-            fields
-        }
-    ];
+    return [{
+        fields
+    }];
 }
 
 function setResults(input, data) {
