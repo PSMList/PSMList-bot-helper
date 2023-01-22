@@ -37,8 +37,6 @@ export async function execute(message) {
 			case 'fort':
 			case 'treasure':
 			case 'keyword':
-				// get search type and remove it from args for future processing
-				const searchType = args.shift();
 				if (command === 'search' && args.length === 0) {
 					return message.channel.send(
 						replyWithEmbeds({
@@ -46,6 +44,8 @@ export async function execute(message) {
 						})
 					);
 				}
+				// get search type and remove it from args for future processing
+				const searchType = args.shift();
 				if (command !== 'keyword' || searchType === 'name') {
 					return search(message, command, searchType, args);
 				}
