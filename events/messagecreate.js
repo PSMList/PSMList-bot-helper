@@ -42,7 +42,7 @@ export async function execute(message) {
 				if (command === 'search' && args.length === 0) {
 					return message.channel.send(
 						replyWithEmbeds({
-							description: `More content is available at https://psmlist.com/public/${command}/search`
+							description: `More content is available on [PSMList.com](https://psmlist.com/public/)`
 						})
 					);
 				}
