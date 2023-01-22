@@ -25,7 +25,7 @@ export async function execute(interaction) {
 
     const embed = list(which);
     const reply = replyWithEmbeds(embed);
-    interaction.reply(
+    interaction.editReply(
         reply
     );
 }

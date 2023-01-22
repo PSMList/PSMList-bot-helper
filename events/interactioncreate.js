@@ -1,4 +1,5 @@
 import { Events } from 'discord.js';
+import { replyWithEmbeds } from '../commons/utils.js';
 
 export const name = Events.InteractionCreate;
 export const once = false;
@@ -16,10 +17,11 @@ export async function execute(interaction) {
 	}
 
 	try {
+		await interaction.deferReply();
 		await command.execute(interaction);
 	} catch (error) {
 		console.error(error);
-        interaction.reply(
+        await interaction.editReply(
             replyWithEmbeds({title: 'There was an error while executing this command!' })
         );
 	}

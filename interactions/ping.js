@@ -12,7 +12,7 @@ export async function execute(interaction) {
 
     const reply  = replyWithEmbeds(embed);
     reply.ephemeral = true;
-    interaction.reply(
+    interaction.editReply(
         reply
     );
 }

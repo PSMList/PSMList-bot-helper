@@ -46,7 +46,17 @@ export async function execute(interaction) {
     const embeds = await search(command, type, query);
 
     const reply = replyWithEmbeds(embeds);
-    interaction.reply(
-        reply
-    );
+
+    try {
+        await interaction.editReply(reply)
+    }
+    catch (err) {
+        // console.log(err);
+        await interaction.editReply(
+            replyWithEmbeds({
+                title: 'Unexpected internal error',
+                description: 'Please try again later or contact the bot maintainers.'
+            })
+        );
+    }
 }

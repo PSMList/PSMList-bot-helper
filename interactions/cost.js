@@ -46,7 +46,7 @@ export async function execute(interaction) {
 	const embed = cost(masts, cargo, speed, cannons);
 
     const reply = replyWithEmbeds(embed);
-    interaction.reply(
+    interaction.editReply(
         reply
     );
 }
