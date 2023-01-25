@@ -27,7 +27,7 @@ export async function execute(interaction) {
     const embed = help(command ?? 'help', '/');
 
     const reply = replyWithEmbeds(embed);
-    interaction.editReply(
+    interaction.followUp(
         reply
     );
 }

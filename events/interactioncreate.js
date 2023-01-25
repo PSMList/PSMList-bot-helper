@@ -21,7 +21,7 @@ export async function execute(interaction) {
 		await command.execute(interaction);
 	} catch (error) {
 		console.error(error);
-        await interaction.editReply(
+        await interaction.followUp(
             replyWithEmbeds({title: 'There was an error while executing this command!' })
         );
 	}
