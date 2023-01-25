@@ -38,7 +38,7 @@ export function replyWithEmbeds(embeds) {
         return {
             embeds: [{
                 title: 'Search: too many results',
-                description: 'Results contains too much lines to be displayed, please refine your search terms.'
+                description: 'Results contain too much lines to be displayed, please refine your search terms.'
             }]
         }
     }
