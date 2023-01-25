@@ -1,4 +1,5 @@
 import cost from '../commons/cost.js';
+import { replyWithEmbeds } from '../commons/utils.js';
 
 export default function(message, args) {
 	const matches = args.join(' ').toUpperCase().match(/([0-9]|10) ([0-9]|10) ((?:[SLDT]\+?)+) ((?:[1-6](?:S|L) ?)+)/);

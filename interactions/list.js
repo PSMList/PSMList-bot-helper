@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import list from '../commons/list.js';
 import { tables } from '../commons/dbdata.js';
+import { replyWithEmbeds } from '../commons/utils.js';
 
 export const data =
 	new SlashCommandBuilder()

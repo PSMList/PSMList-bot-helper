@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import cost from '../commons/cost.js';
 import { sanitize } from '../commons/utils.js';
+import { replyWithEmbeds } from '../commons/utils.js';
 
 export const data =
 	new SlashCommandBuilder()
