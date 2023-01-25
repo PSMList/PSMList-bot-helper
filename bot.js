@@ -2,15 +2,22 @@ import './api.js';
 import * as commands from './interactions/index.js';
 import * as events from './events/index.js';
 
-import { Client, Collection, GatewayIntentBits } from 'discord.js';
+import { ActivityType, Client, Collection, GatewayIntentBits } from 'discord.js';
 import { BOT_TOKEN } from './secret.js';
 
-const bot = new Client({ intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.DirectMessages,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
-] });
+const bot = new Client({
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.DirectMessages,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.MessageContent
+	],
+	presence: {
+		activities: [
+			{ name: '/help', type: ActivityType.Playing }
+		]
+	}
+});
 
 bot.commands = new Collection();
 
