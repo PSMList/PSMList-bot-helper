@@ -34,14 +34,14 @@ function isValidEmbed(data) {
 
 export function replyWithEmbeds(embeds) {
     embeds = Array.isArray(embeds) ? embeds : [ embeds ];
-    if (stringEmbedLength(embeds) > 6500) {
-        return {
-            embeds: [{
-                title: 'Search: too many results',
-                description: 'Results contain too much lines to be displayed, please refine your search terms.'
-            }]
-        }
-    }
+    // if (stringEmbedLength(embeds) > 6500) {
+    //     return {
+    //         embeds: [{
+    //             title: 'Search: too many results',
+    //             description: 'Results contain too much lines to be displayed, please refine your search terms.'
+    //         }]
+    //     }
+    // }
     const filteredEmbeds = [];
     for (const embed of embeds) {
         if (isValidEmbed(embed)) {

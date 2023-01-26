@@ -47,16 +47,5 @@ export async function execute(interaction) {
 
     const reply = replyWithEmbeds(embeds);
 
-    try {
-        await interaction.followUp(reply);
-    }
-    catch (err) {
-        console.log(err);
-        await interaction.followUp(
-            replyWithEmbeds({
-                title: 'Unexpected internal error',
-                description: 'Please try again later or contact the bot maintainers.'
-            })
-        );
-    }
+    await interaction.reply(reply);
 }

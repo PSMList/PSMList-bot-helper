@@ -17,12 +17,14 @@ export async function execute(interaction) {
 	}
 
 	try {
-		await interaction.deferReply();
 		await command.execute(interaction);
 	} catch (error) {
-		console.error(error);
-        await interaction.followUp(
-            replyWithEmbeds({title: 'There was an error while executing this command!' })
+		console.log(error);
+        await interaction.channel.send(
+            replyWithEmbeds({
+                title: 'Unexpected internal error',
+                description: 'Please try again later or contact the bot maintainers.'
+            })
         );
 	}
 }
