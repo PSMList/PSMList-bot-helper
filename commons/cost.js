@@ -3,7 +3,7 @@ import { emojis } from '../config.js';
 function outputSimulatedCost(masts, cargo, speed, cannons){
 	const total = masts + cargo + speed + cannons;
 
-	return `${emojis.masts} ${masts} ${emojis.cargo} ${cargo} ${emojis.speed} ${speed} ${emojis.cannon} ${cannons} = :coin: ${total.toFixed(1)}`;
+	return `${emojis.masts} ${masts} ${emojis.cargo} ${cargo} ${emojis.speed} ${speed} ${emojis.cannon} ${cannons} = :coin: ${total.toFixed(1).replace('.0', '')}`;
 }
 
 const mastsRegex = new RegExp(/^[0-9]|10$/);
