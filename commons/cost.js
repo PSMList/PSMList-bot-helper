@@ -8,8 +8,8 @@ function outputSimulatedCost(masts, cargo, speed, cannons){
 
 const mastsRegex = new RegExp(/^[0-9]|10$/);
 const cargoRegex = new RegExp(/^[0-9]|10$/);
-const speedRegex = new RegExp(/^([SLDT]\+?)+$/g);
-const cannonsRegex = new RegExp(/^([1-6][SL] ?)+$/g);
+const speedRegex = new RegExp(/^([SLDT]\+?)+$/);
+const cannonsRegex = new RegExp(/^([1-6][SL] ?)+$/);
 
 function checkInputs(masts, cargo, speed, cannons) {
 	const errors = [];
