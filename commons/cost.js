@@ -11,21 +11,24 @@ const cargoRegex = new RegExp(/^[0-9]|10$/);
 const speedRegex = new RegExp(/^([SLDT]\+?)+$/);
 const cannonsRegex = new RegExp(/^([1-6][SL] ?)+$/);
 
-function checkInputs(masts, cargo, speed, cannons) {
-	const errors = [];
-	if (!mastsRegex.test(masts)) errors.push('`masts` should be a number between 1 and 10');
-	if (!cargoRegex.test(cargo)) errors.push('`cargo` should be a number between 0 and 10');
-	if (!speedRegex.test(speed)) errors.push('`speed` should be letters (S, L, D, T) with or without a + sign in between (ex: "S+L" or "sSs")');
-	if (!cannonsRegex.test(cannons)) errors.push('`cannons` should be dice (1 to 6) and range (S or L) with or without a space in between (ex: "4S3L2L4S" or "4s 3l 2l 4s")');
-	return errors;
-}
-
 function round(value) {
 	return Math.floor(value * 10) / 10;
 }
 
 export default function cost(masts, cargo, speed, cannons) {
-	const errors = checkInputs(masts, cargo, speed, cannons);
+	const errors = [];
+	if (!mastsRegex.test(masts)) {
+		errors.push('`masts` should be a number between 1 and 10');
+	}
+	if (!cargoRegex.test(cargo)) {
+		errors.push('`cargo` should be a number between 0 and 10');
+	}
+	if (!speedRegex.test(speed)) {
+		errors.push('`speed` should be letters (S, L, D, T) with or without a + sign in between (ex: "S+L" or "sSs")');
+	}
+	if (!cannonsRegex.test(cannons)) {
+		errors.push('`cannons` should be dice (1 to 6) and range (S or L) with or without a space in between (ex: "4S3L2L4S" or "4s 3l 2l 4s")');
+	}
 
 	if (errors.length > 0) {
 		return {
