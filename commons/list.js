@@ -15,6 +15,10 @@ function sortByName(a, b) {
     return a.name < b.name ? -1 : 1;   
 }
 
+function sortById(a, b) {
+    return a.id < b.id ? -1 : 1;   
+}
+
 
 (async () => {
     await dbDataPromise;
@@ -40,7 +44,7 @@ function sortByName(a, b) {
             case tables[2]:
                 embed.description =
                     Object.values(dbData[tables[2]])
-                    .sort(sortByName)
+                    .sort(sortById)
                     .reduce((output, rarity) => `${output}${emojis[rarity.colorhex]} ${rarity.name}\n`, "");
                 break;
             case tables[3]:
