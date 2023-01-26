@@ -41,8 +41,8 @@ export const data =
 export async function execute(interaction) {
 	const masts = interaction.options.getInteger("masts");
 	const cargo = interaction.options.getInteger("cargo");
-	const speed = sanitize(interaction.options.getString("speed"));
-	const cannons = sanitize(interaction.options.getString("cannons"));
+	const speed = sanitize(interaction.options.getString("speed")).toUpperCase();
+	const cannons = sanitize(interaction.options.getString("cannons")).toUpperCase();
 
 	const embed = cost(masts, cargo, speed, cannons);
 
