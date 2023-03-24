@@ -428,7 +428,7 @@ keyword.get('/target', (req, res) => {
  */
 
 api.get('/faction', (req, res) => {
-    poolQuery("SELECT * FROM faction;")
+    poolQuery("SELECT * FROM faction WHERE custom = 0;")
     .then( results => {
 		res.json(results);
 	})
@@ -443,7 +443,7 @@ api.get('/faction', (req, res) => {
  */
 
 api.get('/extension', (req, res) => {
-    poolQuery("SELECT * FROM extension;")
+    poolQuery("SELECT * FROM extension WHERE custom = 0;")
     .then( results => {
 		res.json(results);
 	})
