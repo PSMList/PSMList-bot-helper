@@ -29,33 +29,33 @@ function sortById(a, b) {
         }
 
         switch (table) {
-            case tables[0]:
+            case 'faction':
                 embed.description =
-                    Object.values(dbData[tables[0]])
+                    Object.values(dbData['faction'])
                         .sort(sortByName)
                         .reduce((output, faction) => output + emojis[faction.nameimg] + " \u200b " + faction.name + "\n", "");
                 break;
-            case tables[1]:
+            case 'extension':
                 embed.description =
-                    Object.values(dbData[tables[1]])
+                    Object.values(dbData['extension'])
                     // .sort(sortByName)
                     .reduce((output, extension) => output + emojis[extension.short] + " \u200b " + extension.name + " - " + extension.short + (extension.shortcommunity ? " - " + extension.shortcommunity : '') + (extension.shortwizkids ? " - " + extension.shortwizkids : '') + "\n", "");
                 break;
-            case tables[2]:
+            case 'rarity':
                 embed.description =
-                    Object.values(dbData[tables[2]])
+                    Object.values(dbData['rarity'])
                     .sort(sortById)
                     .reduce((output, rarity) => `${output}${emojis[rarity.colorhex]} ${rarity.name}\n`, "");
                 break;
-            case tables[3]:
+            case 'keyword/category':
                 embed.description =
-                    Object.values(dbData[tables[3]])
+                    Object.values(dbData['keyword/category'])
                     .sort(sortByName)
                     .reduce((output, kw_category) => `${output} ${kw_category.name}\n`, "");
                 break;
-            case tables[4]:
+            case 'keyword/target':
                 embed.description =
-                    Object.values(dbData[tables[4]])
+                    Object.values(dbData['keyword/target'])
                     .sort(sortByName)
                     .reduce((output, kw_target) => `${output} ${kw_target.name}\n`, "");
                 break;
