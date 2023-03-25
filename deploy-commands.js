@@ -1,3 +1,4 @@
+import './api.js';
 import { REST, Routes } from 'discord.js';
 import { CLIENT_ID, GUILD_IDS, BOT_TOKEN } from './secret.js';
 // Grab all the command files from the commands directory you created earlier
