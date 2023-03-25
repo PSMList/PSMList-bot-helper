@@ -1,6 +1,15 @@
 import fetch from 'node-fetch';
 import { API_URI } from '../config.js';
-import { tables } from './list.js';
+
+export const tablesTitleMap = {
+    extension: 'Expansions',
+    faction: 'Factions',
+    rarity: 'Rarities',
+    'keyword/category': 'Keyword categories',
+    'keyword/target': 'Keyword targets'
+}
+
+export const tables = Object.keys(tablesTitleMap);
 
 async function loadData(type) {
     const exports = {};

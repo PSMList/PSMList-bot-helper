@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
-import list, { tablesTitleMap } from '../commons/list.js';
+import { tablesTitleMap } from '../commons/dbdata.js';
+import list from '../commons/list.js';
 import { replyWithEmbeds } from '../commons/utils.js';
 
 export const data =

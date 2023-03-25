@@ -1,17 +1,7 @@
 import { emojis } from '../config.js';
-import dbData, { dbDataPromise } from '../commons/dbdata.js';
+import dbData, { dbDataPromise, tables, tablesTitleMap } from '../commons/dbdata.js';
 
 const embeds = {};
-
-export const tablesTitleMap = {
-    extension: 'Expansions',
-    faction: 'Factions',
-    rarity: 'Rarities',
-    'keyword/category': 'Keyword categories',
-    'keyword/target': 'Keyword targets'
-}
-
-export const tables = Object.keys(tablesTitleMap);
 
 function sortByName(a, b) {
     return a.name < b.name ? -1 : 1;   
