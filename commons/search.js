@@ -1,5 +1,5 @@
 import { API_URI, emojis } from '../config.js';
-import dbData, { tables } from '../commons/dbdata.js';
+import dbData from '../commons/dbdata.js';
 import fetch from 'node-fetch';
 
 export const types = {
@@ -47,8 +47,8 @@ function buildItemEmbed(type, data) {
                 url,
                 fields: [
                     { name: 'Cost', value: item.cost.toString(), inline: true },
-                    { name: 'Category', value: dbData[tables[3]][item.idkeywordtype].name, inline: true },
-                    { name: 'Target', value: dbData[tables[4]][item.idkeywordtarget].name, inline: true },
+                    { name: 'Category', value: dbData['keyword/category'][item.idkeywordtype].name, inline: true },
+                    { name: 'Target', value: dbData['keyword/target'][item.idkeywordtarget].name, inline: true },
                     { name: 'Effect', value: truncateField(item.effect, url) }
                 ]
             }
@@ -58,8 +58,8 @@ function buildItemEmbed(type, data) {
 
     for (const index in data) {
         const item = data[index];
-        const faction = dbData[tables[0]][item.idfaction];
-        const extensionObject = dbData[tables[1]][item.idextension];
+        const faction = dbData['faction'][item.idfaction];
+        const extensionObject = dbData['extension'][item.idextension];
 
         const itemID = extensionObject.short + item.numid;
 
@@ -71,7 +71,7 @@ function buildItemEmbed(type, data) {
 
         const itemEmbed = {
             title: `${item.name} (${itemID})`,
-            color: parseInt(dbData[tables[2]][item.idrarity].colorhex, 16),
+            color: parseInt(dbData['rarity'][item.idrarity].colorhex, 16),
             url,
             image: { url: `https://psmlist.com/public/img/gameicons/full/${extensionObject.short}/${item.numid}.jpg` }
         }
@@ -150,8 +150,8 @@ function buildItemsEmbed(type, items) {
 
         if (type !== 'keyword') {
             output = items.slice(i, i + 8).reduce((accu, item) => {
-                const faction = dbData[tables[0]][item.idfaction];
-                const extensionObject = dbData[tables[1]][item.idextension];
+                const faction = dbData['faction'][item.idfaction];
+                const extensionObject = dbData['extension'][item.idextension];
                 const url = `https://psmlist.com/public/${(type !== 'fort' ? type : 'ship')}/${extensionObject.short}${item.numid}`;
                 const nameAndFaction = `${(faction && faction.nameimg ? ' \u200b ' + emojis[faction.nameimg] : '')} \u200b ${item.name}`;
     
@@ -201,7 +201,7 @@ function setResults(input, data) {
             dataByType[input] = data;
         }
 
-        const extensions = dbData[tables[1]]
+        const extensions = dbData['extension']
 
         // check if there would be one item to show or two corresponding to crew from the same card (with same extension and numid)
         const isSingleEmbed =

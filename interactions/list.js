@@ -1,6 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import list from '../commons/list.js';
-import { tables } from '../commons/dbdata.js';
+import list, { tablesTitleMap } from '../commons/list.js';
 import { replyWithEmbeds } from '../commons/utils.js';
 
 export const data =
@@ -13,11 +12,7 @@ export const data =
                 .setDescription('Values of...')
                 .setRequired(true)
                 .addChoices(
-                    { name: 'Expansions', value: tables[0] },
-                    { name: 'Factions', value: tables[1] },
-                    { name: 'Rarities', value: tables[2] },
-                    { name: 'Keyword categories', value: tables[3] },
-                    { name: 'Keyword targets', value: tables[4] }
+                    ...Object.entries(tablesTitleMap).map( table => ({value: table[0], name: table[1]}))
                 )
         );
 

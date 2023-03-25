@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import { API_URI } from '../config.js';
+import { tables } from './list.js';
 
 async function loadData(type) {
     const exports = {};
@@ -47,8 +48,6 @@ async function loadData(type) {
 
     return exports;
 }
-
-export const tables = ['faction', 'extension', 'rarity', 'keyword/category', 'keyword/target'];
 
 export const dbDataPromise = Promise.all(tables.map(table => loadData(table)));
 
