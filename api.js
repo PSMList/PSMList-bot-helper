@@ -92,7 +92,7 @@ function formatExactRegex(regex) {
 }
 
 function allItemsQuery(type) {
-	return `SELECT i.*, e.short as extensionname, f.nameimg as factionimg FROM ${type} as i INNER JOIN (SELECT id, short FROM extension) as e ON e.id = i.idextension INNER JOIN (SELECT id, nameimg FROM faction) as f ON f.id = i.idfaction;`
+	return `SELECT i.*, e.short as extensionname, f.nameimg as factionimg FROM ${type} as i INNER JOIN (SELECT id, short FROM extension) as e ON e.id = i.idextension INNER JOIN (SELECT id, nameimg FROM faction) as f ON f.id = i.idfaction WHERE i.idextension IN (SELECT id FROM extension WHERE custom = 0);`
 }
 
 /*
@@ -122,7 +122,7 @@ ship.get('/id/:ship', (req, res) => {
 
 	const extensionShort = parts[1], prefix = parts[2], numID = parts[3];
 
-	const query = "SELECT * FROM ship WHERE idtype != 2 AND numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
+const query = "SELECT * FROM ship WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND idtype != 2 AND numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
 	const params = extensionShort ? [`^${prefix ?? ''}0*${numID}a?$`, extensionShort, extensionShort, extensionShort] : [`^${prefix ?? ''}0*${numID}a?$`];
 	// console.log(params);
 
@@ -144,7 +144,7 @@ ship.get('/name/:ship', (req, res) => {
 		return res.json([]);
 	}
 
-	poolQuery("SELECT * FROM ship WHERE idtype != 2 AND name LIKE ?;", formatExactRegex(shipName))
+	poolQuery("SELECT * FROM ship WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND idtype != 2 AND name LIKE ?;", formatExactRegex(shipName))
 	.then( results => {
 		res.json(results);
 	})
@@ -174,7 +174,7 @@ fort.get('/id/:fort', (req, res) => {
 
 	const extensionShort = parts[1], prefix = parts[2], numID = parts[3];
 
-	const query = "SELECT * FROM ship WHERE idtype = 2 AND numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
+	const query = "SELECT * FROM ship WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND idtype = 2 AND numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
 	const params = extensionShort ? [`^${prefix ?? ''}0*${numID}$`, extensionShort, extensionShort, extensionShort] : [`^${prefix ?? ''}0*${numID}$`];
 
 	poolQuery(query, params)
@@ -194,7 +194,7 @@ fort.get('/name/:fort', (req, res) => {
 		return res.json([]);
 	}
 
-	poolQuery("SELECT * FROM ship WHERE idtype = 2 AND name LIKE ?;", formatExactRegex(fortName))
+	poolQuery("SELECT * FROM ship WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND idtype = 2 AND name LIKE ?;", formatExactRegex(fortName))
 	.then( results => {
 		res.json(results);
 	})
@@ -231,7 +231,7 @@ crew.get('/id/:crew', (req, res) => {
 
 	const extensionShort = parts[1], prefix = parts[2], numID = parts[3];
 
-	const query = "SELECT * FROM crew WHERE numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
+	const query = "SELECT * FROM crew WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
 	const params = extensionShort ? [`^${prefix ?? ''}0*${numID}[ab]?$`, extensionShort, extensionShort, extensionShort] : [`^${prefix ?? ''}0*${numID}[ab]?$`];
 
 	poolQuery(query, params)
@@ -251,7 +251,7 @@ crew.get('/name/:crew', (req, res) => {
 		return res.json([]);
 	}
 
-	poolQuery("SELECT * FROM crew WHERE name LIKE ?;", formatExactRegex(crewName))
+	poolQuery("SELECT * FROM crew WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND name LIKE ?;", formatExactRegex(crewName))
 	.then( results => {
 		res.json(results);
 	})
@@ -280,7 +280,7 @@ treasure.get('/id/:treasure', (req, res) => {
 
 	const extensionShort = parts[1], prefix = parts[2], numID = parts[3];
 
-	const query = "SELECT * FROM treasure WHERE numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
+	const query = "SELECT * FROM treasure WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
 	const params = extensionShort ? [`^${prefix ?? ''}0*${numID}b?$`, extensionShort, extensionShort, extensionShort] : [`^${prefix ?? ''}0*${numID}b?$`];
 
 	poolQuery(query, params)
@@ -300,7 +300,7 @@ treasure.get('/name/:treasure', (req, res) => {
 		return res.json([]);
 	}
 
-	poolQuery("SELECT * FROM treasure WHERE name LIKE ?;", formatExactRegex(treasureName))
+	poolQuery("SELECT * FROM treasure WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND name LIKE ?;", formatExactRegex(treasureName))
 	.then( results => {
 		res.json(results);
 	})
