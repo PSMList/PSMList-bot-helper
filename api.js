@@ -6,17 +6,13 @@ import { DB as dbConfig } from './secret.js';
 import { API_PORT, API_URI } from './config.js';
 
 const pool = mysql.createPool({
-    connectionLimit : 20,
+	connectionLimit : 20,
 	port : 3306,
 	...dbConfig,
 });
 
 pool.getConnection( err => {
-    if (err) {
-    	console.log('Unable to connect to database!');
-    	throw err;
-	}
-    else {
+	if (!err) {
 		console.log('Database is connected!');
 	}
 });
@@ -34,13 +30,13 @@ function poolQuery(query, args) {
 	});
 }
 
-let extensionsData, extensionsRegex;
+let extensionsRegex;
 fetch(`${API_URI}/extension`)
 .then( res => res.json() )
 .then( extensionsData => {
-    const extensionShorts = [];
-    Object.values(extensionsData).forEach((extension) => {
-    	extensionShorts.push(extension.short)
+	const extensionShorts = [];
+	Object.values(extensionsData).forEach((extension) => {
+		extensionShorts.push(extension.short)
 		if (extension.shortcommunity) {
 			extensionShorts.push(extension.shortcommunity)
 		}
@@ -51,8 +47,8 @@ fetch(`${API_URI}/extension`)
 		extensionShorts.reduce(
 			(accu, extension, index) =>
 				accu + extension + (index < extensionShorts.length - 1 ? '|' : ''), ''
-		) +
-	')';
+		)
+	  + ')';
 });
 
 
@@ -117,14 +113,14 @@ ship.get('/id/:ship', (req, res) => {
 		return res.json([]);
 	}
 
-	const parts = shipID.match(extensionsRegex + '?([^-]+-)?(.+)');
-	// console.log(parts);
+	const parts = shipID.match(extensionsRegex + '?([a-zA-Z]+-)?(.+)');
 
 	const extensionShort = parts[1], prefix = parts[2], numID = parts[3];
 
-const query = "SELECT * FROM ship WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND idtype != 2 AND numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
-	const params = extensionShort ? [`^${prefix ?? ''}0*${numID}a?$`, extensionShort, extensionShort, extensionShort] : [`^${prefix ?? ''}0*${numID}a?$`];
-	// console.log(params);
+	const regex = `^([a-zA-Z]+-)?${prefix ?? ''}0*${numID}$`;
+
+	const query = "SELECT * FROM ship WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND idtype != 2 AND numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
+	const params = extensionShort ? [regex, extensionShort, extensionShort, extensionShort] : [regex];
 
 	poolQuery(query, params)
 	.then( results => {
@@ -169,13 +165,14 @@ fort.get('/id/:fort', (req, res) => {
 		return res.json([]);
 	}
 
-	const parts = fortID.match(extensionsRegex + '?([^-]+-)?(.+)');
-	// console.log(parts);
+	const parts = fortID.match(extensionsRegex + '?([a-zA-Z]+-)?(.+)');
 
 	const extensionShort = parts[1], prefix = parts[2], numID = parts[3];
 
+	const regex = `^([a-zA-Z]+-)?${prefix ?? ''}0*${numID}$`;
+
 	const query = "SELECT * FROM ship WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND idtype = 2 AND numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
-	const params = extensionShort ? [`^${prefix ?? ''}0*${numID}$`, extensionShort, extensionShort, extensionShort] : [`^${prefix ?? ''}0*${numID}$`];
+	const params = extensionShort ? [regex, extensionShort, extensionShort, extensionShort] : [regex];
 
 	poolQuery(query, params)
 	.then( results => {
@@ -226,13 +223,14 @@ crew.get('/id/:crew', (req, res) => {
 		return res.json([]);
 	}
 
-	const parts = crewID.match(extensionsRegex + '?([^-]+-)?(.+)');
-	// console.log(parts);
+	const parts = crewID.match(extensionsRegex + '?([a-zA-Z]+-)?(.+)');
 
 	const extensionShort = parts[1], prefix = parts[2], numID = parts[3];
 
+	const regex = `^([a-zA-Z]+-)?${prefix ?? ''}0*${numID}-?[abc]?$`;
+
 	const query = "SELECT * FROM crew WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
-	const params = extensionShort ? [`^${prefix ?? ''}0*${numID}[ab]?$`, extensionShort, extensionShort, extensionShort] : [`^${prefix ?? ''}0*${numID}[ab]?$`];
+	const params = extensionShort ? [regex, extensionShort, extensionShort, extensionShort] : [regex];
 
 	poolQuery(query, params)
 	.then( results => {
@@ -276,12 +274,14 @@ treasure.get('/id/:treasure', (req, res) => {
 		return res.json([]);
 	}
 
-	const parts = treasureID.match(extensionsRegex + '?([^-]+-)?(.+)');
+	const parts = treasureID.match(extensionsRegex + '?([a-zA-Z]+-)?(.+)');
 
 	const extensionShort = parts[1], prefix = parts[2], numID = parts[3];
 
+	const regex = `^${prefix ?? ''}0*${numID}b?$`;
+
 	const query = "SELECT * FROM treasure WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
-	const params = extensionShort ? [`^${prefix ?? ''}0*${numID}b?$`, extensionShort, extensionShort, extensionShort] : [`^${prefix ?? ''}0*${numID}b?$`];
+	const params = extensionShort ? [regex, extensionShort, extensionShort, extensionShort] : [regex];
 
 	poolQuery(query, params)
 	.then( results => {
@@ -327,13 +327,14 @@ event.get('/id/:event', (req, res) => {
 		return res.json([]);
 	}
 
-	const parts = eventID.match(extensionsRegex + '?([^-]+-)?(.+)');
-	// console.log(parts);
+	const parts = eventID.match(extensionsRegex + '?([a-zA-Z]+-)?(.+)');
 
 	const extensionShort = parts[1], prefix = parts[2], numID = parts[3];
 
+	const regex = `^${prefix ?? ''}0*${numID}?$`;
+
 	const query = "SELECT * FROM event WHERE numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
-	const params = extensionShort ? [`^${prefix ?? ''}0*${numID}?$`, extensionShort, extensionShort, extensionShort] : [`^${prefix ?? ''}0*${numID}?$`];
+	const params = extensionShort ? [regex, extensionShort, extensionShort, extensionShort] : [regex];
 
 	poolQuery(query, params)
 	.then( results => {
