@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import mysql from 'mysql';
+import mysql from 'mysql2';
 import fetch from 'node-fetch';
 import { DB as dbConfig } from './secret.js';
 import { API_PORT, API_URI } from './config.js';
