@@ -69,6 +69,5 @@ export default function list(table) {
     return {
         title: data.title,
         description: data.description,
-        footer: { text: 'Provided by PSMList.com', icon_url: 'https://psmlist.com/public/img/logo_small.png' }
     };
 }

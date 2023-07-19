@@ -74,7 +74,14 @@ export function replyWithEmbeds(embeds) {
                 });
             }
         }
+
+    const lastEmbed = embeds[0];
+    if (typeof lastEmbed === 'string') {
+        embeds[0] = {
+            description: embeds[0]
+        };
     }
+    lastEmbed.footer = { text: 'Provided by PSMList.com', icon_url: 'https://psmlist.com/public/img/logo_small.png' };
 
     return {
         embeds: filteredEmbeds 

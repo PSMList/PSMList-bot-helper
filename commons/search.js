@@ -253,8 +253,6 @@ function setResults(input, data) {
                 )
             )
         }
-        embeds.at(-1)
-            .footer = { text: 'Provided by PSMList.com', icon_url: 'https://psmlist.com/public/img/logo_small.png' }
         return embeds;
     }
     const type = types.choices.name.find( choice => choice.value === input ).name;

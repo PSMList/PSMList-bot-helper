@@ -10,10 +10,12 @@ export async function execute(interaction) {
 	const command = interaction.client.commands.get(interaction.commandName);
 
 	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
-        return interaction.reply(
-            replyWithEmbeds({title: `No command matching ${interaction.commandName} was found.` })
-        );
+		const error = `No command matching ${interaction.commandName} was found.`;
+		console.error(error);
+
+		return interaction.reply(
+			replyWithEmbeds({title: error})
+		);
 	}
 
 	try {
