@@ -32,48 +32,50 @@ function isValidEmbed(data) {
     return true;
 }
 
-export function replyWithEmbeds(embeds) {
-    embeds = Array.isArray(embeds) ? embeds : [ embeds ];
-    if (stringEmbedLength(embeds) > 6500) {
-        return {
-            embeds: [{
-                title: 'Search: too many results',
-                description: 'Results contain too much lines to be displayed, please refine your search terms.'
-            }]
-        }
-    }
-    const filteredEmbeds = [];
-    for (const embed of embeds) {
-        if (isValidEmbed(embed)) {
-            filteredEmbeds.push(embed);
-        }
-        else {
-            const title = embed.title ?
-                embed.title
-                :
-                embed.description && embed.description.length < 30 ?
-                    embed.description
-                    :
-                    embed.fields && embed.fields.length > 0 && embed.fields[0].name ?
-                        embed.fields[0].name
-                        :
-                        null
+function cutStringBeforeNewLine(string, length) {
+    string = string.substring(length);
+    const newLineIndex = string.lastIndexOf('\n');
+    return string.substring(newLineIndex);
+}
 
-            if (embed.title) {
-                console.log(`Too long response${title ? ` for: ${title}` : ''}`);
-                filteredEmbeds.push({
-                    title: `${title ? `${title}: ` : ''}too long response`,
-                    description: 'Please contact bot administrators.'
-                });
-            }
-            else {
-                console.log(`Too many results${title ? ` for: ${title}` : ''}`);
-                filteredEmbeds.push({
-                    title: `${title ? `${title}: ` : ''}too many results`,
-                    description: 'Results contains too much lines to be displayed, please refine your search terms.'
-                });
+export function replyWithEmbeds(embeds) {    
+    if (!Array.isArray(embeds)) {
+        embeds = [embeds];
+    }
+
+    if (stringEmbedLength(embeds) > 6500) {
+        let biggestEmbed = embeds[0];
+        for (let index in embeds) {
+            if (stringEmbedLength(embeds[index]) > stringEmbedLength(biggestEmbed)) {
+                biggestEmbed = embeds[index];
             }
         }
+        if (typeof biggestEmbed === 'string') {
+            embeds[index] = cutStringBeforeNewLine(biggestEmbed, 3000);
+        }
+        if (typeof biggestEmbed === 'object') {
+            if (biggestEmbed.hasOwnProperty('description') && biggestEmbed.description.length > 3000) {
+                biggestEmbed.description = StringBeforeNewLine(biggestEmbed.description, 3000) + '...';
+            }
+            if (biggestEmbed.hasOwnProperty('fields')) {
+                let removedResultsTotalCount = 0;
+                while(stringEmbedLength(embeds) > 5500) {
+                    const removedField = biggestEmbed.fields.pop();
+                    const removedResultsCount = (removedField.value.match(/\n/gm) || []).length;
+                    removedResultsTotalCount += removedResultsCount;
+                }
+                biggestEmbed.fields.push({ name: ' \u200b', value: `... and ${removedResultsTotalCount} more truncated results`, inline: true });
+            }
+        }
+        embeds.splice(embeds.indexOf(biggestEmbed) + 1, 0, {
+            title: 'Truncated result',
+            description: `This result contains too many lines for Discord to allow displaying everything.
+            Please consider selecting more accurate search terms.
+            
+            In the case you want everything, You can use the [ship](https://psmlist.com/public/ship/search), [crew](https://psmlist.com/public/crew/search) or [treasure](https://psmlist.com/public/treasure/search) search pages directly on [psmlist](https://psmlist.com/public/).`.replace(/^ */gm, ''),
+            color: 0x428BCA
+        });
+    }
 
     const lastEmbed = embeds[0];
     if (typeof lastEmbed === 'string') {
@@ -84,7 +86,7 @@ export function replyWithEmbeds(embeds) {
     lastEmbed.footer = { text: 'Provided by PSMList.com', icon_url: 'https://psmlist.com/public/img/logo_small.png' };
 
     return {
-        embeds: filteredEmbeds 
+        embeds
     }
 }
 
