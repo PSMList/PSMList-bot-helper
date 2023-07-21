@@ -54,7 +54,8 @@ fetch(`${API_URI}/extension`)
 
 const app = express();
 
-app.use(cors())
+app.use(cors());
+app.use(express.urlencoded({ extended: false }));
 
 const api = express.Router();
 app.use('/api', api);
@@ -87,8 +88,22 @@ function formatExactRegex(regex) {
 	return regex;
 }
 
-function allItemsQuery(type) {
-	return `SELECT i.*, e.short as extensionname, f.nameimg as factionimg FROM ${type} as i INNER JOIN (SELECT id, short FROM extension) as e ON e.id = i.idextension INNER JOIN (SELECT id, nameimg FROM faction) as f ON f.id = i.idfaction WHERE i.idextension IN (SELECT id FROM extension WHERE custom = 0);`
+function customConditionFromRequest(req) {
+	if (!req.query || !req.query.custom) {
+		return 'idextension IN (SELECT id FROM extension WHERE custom = 0)';
+	}
+	switch (req.query.custom) {
+		case 'include':
+			return '1 = 1';
+		case 'only':
+			return 'idextension IN (SELECT id FROM extension WHERE custom = 1)';
+		default:
+			return 'idextension IN (SELECT id FROM extension WHERE custom = 0)';
+	}
+}
+
+function allItemsQuery(type, custom) {
+	return `SELECT i.*, e.short as extensionname, f.nameimg as factionimg FROM ${type} as i INNER JOIN (SELECT id, short FROM extension) as e ON e.id = i.idextension INNER JOIN (SELECT id, nameimg FROM faction) as f ON f.id = i.idfaction WHERE ${customConditionFromRequest({ query: custom })};`
 }
 
 /*
@@ -96,7 +111,7 @@ function allItemsQuery(type) {
  */
 
 ship.get('/', (req, res) => {
-	poolQuery(allItemsQuery("ship"))
+	poolQuery(allItemsQuery("ship", req.query.custom))
 	.then( results => {
 		res.json(results);
 	})
@@ -119,7 +134,7 @@ ship.get('/id/:ship', (req, res) => {
 
 	const regex = `^([a-zA-Z]+-)?${prefix ?? ''}0*${numID}$`;
 
-	const query = "SELECT * FROM ship WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND idtype != 2 AND numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
+	const query = "SELECT * FROM ship WHERE " + customConditionFromRequest(req) + " AND idtype != 2 AND numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
 	const params = extensionShort ? [regex, extensionShort, extensionShort, extensionShort] : [regex];
 
 	poolQuery(query, params)
@@ -140,7 +155,7 @@ ship.get('/name/:ship', (req, res) => {
 		return res.json([]);
 	}
 
-	poolQuery("SELECT * FROM ship WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND idtype != 2 AND name LIKE ?;", formatExactRegex(shipName))
+	poolQuery("SELECT * FROM ship WHERE " + customConditionFromRequest(req) + " AND idtype != 2 AND name LIKE ?;", formatExactRegex(shipName))
 	.then( results => {
 		res.json(results);
 	})
@@ -171,7 +186,7 @@ fort.get('/id/:fort', (req, res) => {
 
 	const regex = `^([a-zA-Z]+-)?${prefix ?? ''}0*${numID}$`;
 
-	const query = "SELECT * FROM ship WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND idtype = 2 AND numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
+	const query = "SELECT * FROM ship WHERE " + customConditionFromRequest(req) + " AND idtype = 2 AND numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
 	const params = extensionShort ? [regex, extensionShort, extensionShort, extensionShort] : [regex];
 
 	poolQuery(query, params)
@@ -191,7 +206,7 @@ fort.get('/name/:fort', (req, res) => {
 		return res.json([]);
 	}
 
-	poolQuery("SELECT * FROM ship WHERE idextension IN (SELECT id FROM extension WHERE custom = 0) AND idtype = 2 AND name LIKE ?;", formatExactRegex(fortName))
+	poolQuery("SELECT * FROM ship WHERE " + customConditionFromRequest(req) + " AND idtype = 2 AND name LIKE ?;", formatExactRegex(fortName))
 	.then( results => {
 		res.json(results);
 	})
@@ -315,54 +330,15 @@ treasure.get('/name/:treasure', (req, res) => {
  */
 
 event.get('/', (req, res) => {
-	res.json({error: 'Not available!'});
+	res.json({error: 'Not implemented yet!'});
 });
 
 event.get('/id/:event', (req, res) => {
 	res.json({error: 'Not implemented yet!'});
-
-	/*const eventID = req.params.event.substring(0, 10).toUpperCase();
-
-	if (eventID.length === 0 || eventID.length !== req.params.event.length) {
-		return res.json([]);
-	}
-
-	const parts = eventID.match(extensionsRegex + '?([a-zA-Z]+-)?(.+)');
-
-	const extensionShort = parts[1], prefix = parts[2], numID = parts[3];
-
-	const regex = `^${prefix ?? ''}0*${numID}?$`;
-
-	const query = "SELECT * FROM event WHERE numid REGEXP ?" + (extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?);" : ";");
-	const params = extensionShort ? [regex, extensionShort, extensionShort, extensionShort] : [regex];
-
-	poolQuery(query, params)
-	.then( results => {
-		res.json(results);
-	})
-	.catch( err => {
-		console.trace(err);
-		res.json({error: err});
-	});*/
 });
 
 event.get('/name/:event', (req, res) => {
 	res.json({error: 'Not implemented yet!'});
-
-	/*const eventName = req.params.event.substring(0, 30).toUpperCase();
-
-	if ( eventName.length === 0 || eventName.length !== req.params.event.length) {
-		return res.json([]);
-	}
-
-	poolQuery("SELECT * FROM event WHERE name LIKE ?;", eventName)
-	.then( results => {
-		res.json(results);
-	})
-	.catch( err => {
-		console.trace(err);
-		res.json({error: err});
-	});*/
 });
 
 /*
