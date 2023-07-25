@@ -65,7 +65,7 @@ function formatExactRegex(regex) {
 	return regex;
 }
 
-const checkIfNotCustom = "idextension IN (SELECT id FROM extension WHERE custom = 0)";
+const checkIfNotCustom = "idextension IN (SELECT id FROM extension WHERE custom = 0 AND ispublic = 1)";
 const selectCustomColumn = `, IF(${checkIfNotCustom}, 0, 1) as custom`;
 const idSplitRegex = new RegExp(/^([A-Z]+)?([A-Z]+-)?(\d+-?[ABCG]?)$/);
 
@@ -75,9 +75,9 @@ function customConditionFromRequest(req) {
 	}
 	switch (req.query.custom) {
 		case 'include':
-			return '1 = 1';
+			return 'idextension IN (SELECT id FROM extension WHERE ispublic = 1)';
 		case 'only':
-			return checkIfNotCustom.replace('0', '1');
+			return 'idextension IN (SELECT id FROM extension WHERE custom = 1 AND ispublic = 1)';
 		default:
 			return checkIfNotCustom;
 	}
@@ -418,7 +418,8 @@ api.get('/faction', (req, res) => {
  */
 
 api.get('/extension', (req, res) => {
-    poolQuery("SELECT * FROM extension WHERE custom = 0;")
+		const customExtensionCondition = customConditionFromRequest(req).replace('idextension', 'id');
+    poolQuery("SELECT * FROM extension WHERE " + customExtensionCondition)
     .then( results => {
 		res.json(results);
 	})
