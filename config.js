@@ -4,6 +4,7 @@ export const API_URI = `http://localhost${API_PORT ? ':' + API_PORT : ''}/api`;
 export const prefix = "psm ";
 
 export const emojis = {
+    "psmlist": "<:psmlogo:902540804730544189>",
     "pirate": "<:pirate:848670879068323850>",
     "viking": "<:viking:848670878748901387>",
     "spain": "<:spain:848670885607243836>",

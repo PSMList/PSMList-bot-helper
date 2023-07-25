@@ -24,6 +24,8 @@ export const types = {
     }
 }
 
+export const CUSTOM_DISCLAIMER = '\\* is made by the community';
+
 function truncateField(text, moreUrl) {
     const defaultText = text || '-';
     const trimmedText = defaultText.length < 300 ?
@@ -69,6 +71,10 @@ function buildItemEmbed(type, data) {
 
         const url = `https://psmlist.com/public/${type}/${itemID}`;
 
+        const customPrefix = item.custom ? '\\* \u200b' : '';
+        const extensionEmoji = emojis[extensionObject.short] || emojis['psmlist'];
+        const prefix = customPrefix + extensionEmoji;
+
         const itemEmbed = {
             title: `${item.name} (${itemID})`,
             color: parseInt(dbData['rarity'][item.idrarity].colorhex, 16),
@@ -86,7 +92,7 @@ function buildItemEmbed(type, data) {
                 if (item.isFort) {
                     fields.push(
                         {
-                            name: emojis[extensionObject.short] + ' \u200b ' + extensionObject.name + ' \u200b - \u200b ' + extensionObject.short + ' \u200b \u200b \u200b ' + emojis[faction.nameimg] + ' \u200b ' + faction.name,
+                            name: prefix + ' \u200b ' + extensionObject.name + ' \u200b - \u200b ' + extensionObject.short + ' \u200b \u200b \u200b ' + emojis[faction.nameimg] + ' \u200b ' + faction.name,
                             value: '**' + item.points + ' points** \u200b \u200b ' +
                                 emojis.cannon + '\ ' + item.cannons.match(/\w{2}/g).reduce((cannons, cannon) => cannons + ' \u200b ' + emojis[cannon], ''),
                         },
@@ -97,7 +103,7 @@ function buildItemEmbed(type, data) {
                 else {
                     fields.push(
                         {
-                            name: emojis[extensionObject.short] + ' \u200b ' + extensionObject.name + ' \u200b - \u200b ' + extensionObject.short + ' \u200b \u200b \u200b ' + emojis[faction.nameimg] + ' \u200b ' + faction.name,
+                            name: prefix + ' \u200b ' + extensionObject.name + ' \u200b - \u200b ' + extensionObject.short + ' \u200b \u200b \u200b ' + emojis[faction.nameimg] + ' \u200b ' + faction.name,
                             value: '**' + item.points + ' points**' + ' \u200b \u200b ' +
                                 emojis.masts + ' ' + item.masts + ' \u200b \u200b ' +
                                 emojis.cargo + ' ' + item.cargo + ' \u200b \u200b ' +
@@ -112,7 +118,7 @@ function buildItemEmbed(type, data) {
             case 'crew':
                 fields.push(
                     {
-                        name: emojis[extensionObject.short] + ' \u200b ' + extensionObject.name + ' \u200b - \u200b ' + extensionObject.short + ' \u200b \u200b \u200b ' + emojis[faction.nameimg] + ' \u200b ' + faction.name,
+                        name: prefix + ' \u200b ' + extensionObject.name + ' \u200b - \u200b ' + extensionObject.short + ' \u200b \u200b \u200b ' + emojis[faction.nameimg] + ' \u200b ' + faction.name,
                         value: '**' + item.points + ' points**',
                     },
                     { name: 'Ability', value: defaultAptitude, inline: true },
@@ -122,7 +128,7 @@ function buildItemEmbed(type, data) {
             case 'treasure':
                 fields.push(
                     {
-                        name: emojis[extensionObject.short] + ' \u200b ' + extensionObject.name + ' \u200b - \u200b ' + extensionObject.short,
+                        name: prefix + ' \u200b ' + extensionObject.name + ' \u200b - \u200b ' + extensionObject.short,
                         value: defaultAptitude
                     }
                 );
@@ -131,6 +137,10 @@ function buildItemEmbed(type, data) {
 
         if (type !== 'treasure' && item.lookingforbetterpic === 1) {
             fields.push({ name: 'The current image available for this ship is flagged "unsatisfactory".', value: 'If you are willing to help providing a better image of a built ship, please contact us at support@psmlist.com or via Discord.' })
+        }
+
+        if (item.custom) {
+            fields.push({ name: '\u200b', value: CUSTOM_DISCLAIMER });
         }
 
         itemEmbed.fields = fields;
@@ -144,18 +154,26 @@ function buildItemsEmbed(type, items) {
     const fields = [];
     let title = types.choices.name.find( choice => choice.value === type ).name;
 
+    let hasCustomItem = false;
+
     // pack results in columns of 8
     for (let i = 0; i < items.length; i += 8) {
         let output = '';
 
         if (type !== 'keyword') {
             output = items.slice(i, i + 8).reduce((accu, item) => {
+                if (item.custom) {
+                    hasCustomItem = true;
+                }
+
+                const customPrefix = item.custom ? '\\* ' : '';
+
                 const faction = dbData['faction'][item.idfaction];
                 const extensionObject = dbData['extension'][item.idextension];
                 const url = `https://psmlist.com/public/${(type !== 'fort' ? type : 'ship')}/${extensionObject.short}${item.numid}`;
                 const nameAndFaction = `${(faction && faction.nameimg ? ' \u200b ' + emojis[faction.nameimg] : '')} \u200b ${item.name}`;
     
-                return `${accu}[${extensionObject.short}${item.numid}](${url})${nameAndFaction}\n`;
+                return `${accu}${customPrefix}[${extensionObject.short}${item.numid}](${url})${nameAndFaction}\n`;
             }, '');
         }
         else {
@@ -166,6 +184,10 @@ function buildItemsEmbed(type, items) {
         }
         fields.push({ name: title, value: output, inline: true });
         title = ' \u200b';
+    }
+
+    if (hasCustomItem) {
+        fields.push({name: '\u200b', value: CUSTOM_DISCLAIMER});
     }
 
     return [{
@@ -268,22 +290,22 @@ function setResults(input, data) {
     ];
 }
 
-async function getApiData(command, type, query) {
+async function getApiData(command, type, query, custom) {
     return type === 'all' ?
         Promise.all(types.values[command].slice(1).map(type =>
             getApiData(command, type, query)
         ))
         :
-        await fetch(`${API_URI}/${type}/${command}/${query}`).then(res => res.json());
+        await fetch(`${API_URI}/${type}/${command}/${query}${custom ? '?custom=' + custom : ''}`).then(res => res.json());
 }
 
-export default async function search(command, type, query) {
+export default async function search(command, type, query, custom) {
     const fallback = !types.values[command].includes(type);
     if (fallback) {
         type = 'all';
     }
 
-    const data = await getApiData(command, type, query);
+    const data = await getApiData(command, type, query, custom);
     const embeds = setResults(type, data);
     if (fallback) {
         embeds.unshift(

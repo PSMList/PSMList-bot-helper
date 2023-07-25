@@ -1,4 +1,5 @@
 import { embedLength } from "discord.js";
+import { CUSTOM_DISCLAIMER } from "./search.js";
 
 export function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -60,7 +61,12 @@ export function replyWithEmbeds(embeds) {
             if (biggestEmbed.hasOwnProperty('fields')) {
                 let removedResultsTotalCount = 0;
                 while(stringEmbedLength(embeds) > 5500) {
-                    const removedField = biggestEmbed.fields.pop();
+                    let removedField = biggestEmbed.fields.pop();
+                    if (removedField.value.match(CUSTOM_DISCLAIMER)) {
+                        const customDisclaimerField = removedField;
+                        removedField = biggestEmbed.fields.pop();
+                        biggestEmbed.fields.push(customDisclaimerField);
+                    }
                     const removedResultsCount = (removedField.value.match(/\n/gm) || []).length;
                     removedResultsTotalCount += removedResultsCount;
                 }
@@ -83,7 +89,7 @@ export function replyWithEmbeds(embeds) {
             description: embeds[0]
         };
     }
-    lastEmbed.footer = { text: 'Provided by PSMList.com', icon_url: 'https://psmlist.com/public/img/logo_small.png' };
+    lastEmbed.footer = { text: 'Provided by PSMList.com', icon_url: 'https://psmlist.com/public/img/logo_x32.png' };
 
     return {
         embeds

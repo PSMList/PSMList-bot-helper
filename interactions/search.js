@@ -25,6 +25,15 @@ function setSearchByType(subcommand, command) {
                 .setRequired(true)
                 .setMinLength(command === 'name' ? 3 : 0)
         )
+        .addStringOption( option =>
+            option
+                .setName('custom')
+                .setDescription('Define if results should show only custom items or include them')
+                .addChoices(
+                    { value: 'only', name: 'Only' },
+                    { value: 'include', name: 'Include' },
+                )
+        )
 }
 
 export const data =
@@ -40,10 +49,11 @@ export const data =
 
 export async function execute(interaction) {
     const command = interaction.options.getSubcommand();
+    const custom = interaction.options.getString('custom');
     const type = interaction.options.getString('type');
     const query = sanitize(interaction.options.getString(command));
 
-    const embeds = await search(command, type, query);
+    const embeds = await search(command, type, query, custom);
 
     const reply = replyWithEmbeds(embeds);
 

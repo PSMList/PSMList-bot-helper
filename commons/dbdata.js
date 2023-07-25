@@ -14,7 +14,7 @@ export const tables = Object.keys(tablesTitleMap);
 async function loadData(type) {
     const exports = {};
 
-    const data = await fetch(`${API_URI}/${type}`).then(res => res.json()); // expected to throw error and quit process if api is unreachable
+    const data = await fetch(`${API_URI}/${type}?custom=include`).then(res => res.json()); // expected to throw error and quit process if api is unreachable
 
     if (!data) {
         return;
@@ -29,9 +29,9 @@ async function loadData(type) {
             }
             break;
         case 'extension':
-            for (let { id, name, short, shortcommunity, shortwizkids } of data) {
-                if (id && name && short && shortwizkids) {
-                    exports[id] = { name, short, shortcommunity, shortwizkids };
+            for (let { id, name, short, shortcommunity, shortwizkids, custom } of data) {
+                if (id && name && short) {
+                    exports[id] = { name, short, shortcommunity, shortwizkids, custom };
                 }
             }
             break;
@@ -58,16 +58,24 @@ async function loadData(type) {
     return exports;
 }
 
-export const dbDataPromise = Promise.all(tables.map(table => loadData(table)));
-
 const dbData = {};
 
 export default dbData;
 
-await dbDataPromise
-    .then( results => {
+function setData(promise) {
+    promise.then( results => {
         results.forEach((data, index) => {
             const table = tables[index];
             dbData[table] = data;
         });
     });
+}
+
+export let dbDataPromise = Promise.all(tables.map(table => loadData(table)));
+setData(dbDataPromise);
+
+// refresh info every hour
+setTimeout(async () => {
+    await dbDataPromise;
+    setData(dbDataPromise = Promise.all(tables.map(table => loadData(table))));
+}, 1 * 60 * 60 * 1000);
