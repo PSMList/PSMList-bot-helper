@@ -65,7 +65,7 @@ function formatExactRegex(regex) {
 	return regex;
 }
 
-const checkIfNotCustom = "(e.custom = 0 AND e.ispublic = 1)";
+const checkIfNotCustom = "e.custom = 0";
 const selectCustomColumn = `i.*, e.custom`;
 const idSplitRegex = new RegExp(/^([A-Z]+)?([A-Z]+-)?(\d+-?[ABCG]?)$/);
 const sortById = 'ORDER BY e.searchsort, i.numid';
@@ -234,7 +234,6 @@ crew.get('/id/:crew', (req, res) => {
 	}
 
 	const parts = idSplitRegex.exec(crewID);
-	console.log(parts);
 
 	if (!parts) {
 		return res.json([]);
