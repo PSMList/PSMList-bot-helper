@@ -4,6 +4,21 @@ import { replyWithEmbeds } from '../commons/utils.js';
 
 export default async function(message, command, searchType, args) {
     let input = '';
+    let custom = '';
+
+    if (args[0] === 'custom') {
+        args.shift();
+        if (args[0] !== 'include') {
+            custom = 'only';
+            if (args[0] !== 'only') {
+                args.unshift('');
+            }
+        }
+        else {
+            custom = 'include';
+        }
+        args.shift();
+    }
 
     switch (searchType) {
         case 'id':
@@ -63,7 +78,9 @@ export default async function(message, command, searchType, args) {
                 'ship'
                 :
                 command,
-        input);
+        input,
+        custom
+    );
 
     return message.channel.send(
         replyWithEmbeds(embeds)
