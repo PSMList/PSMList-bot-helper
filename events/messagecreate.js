@@ -26,7 +26,7 @@ export async function execute(message) {
 				title: `:warning: Support for \`${prefix.trim()}\` commands will be dropped on November, 1st`,
 				color: 0xff0000,
 				description: `Please use "slash commands" instead. Type \`/help\` to check available slash commands.
-				More information on [this link](https://psmlist.com/blog/whatever).`
+				More information on [this link](https://psmlist.com/public/blog/discord_slash_commands_update).`
 			})
 		);
 
