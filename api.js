@@ -89,17 +89,8 @@ function allItemsQuery(type, req) {
 	return `SELECT i.*, e.short as extensionname, f.nameimg as factionimg FROM ${type} as i INNER JOIN (SELECT id, short FROM extension) as e ON e.id = i.idextension INNER JOIN (SELECT id, nameimg FROM faction) as f ON f.id = i.idfaction WHERE ${customConditionFromRequest(req)};`
 }
 
-function itemsTableWithExtension(type, requestType) {
-	let extensionColumns = 'id, ispublic, custom';
-	switch (requestType) {
-		case 'id':
-			extensionColumns += ', searchsort';
-			break;
-		case 'name':
-			extensionColumns += ', short, shortcommunity, shortwizkids';
-			break;
-	}
-	return `${type} as i LEFT JOIN (SELECT ${extensionColumns} FROM extension) as e ON e.id = i.idextension`;
+function itemsTableWithExtension(type) {
+	return `${type} as i LEFT JOIN extension as e ON e.id = i.idextension`;
 }
 
 /*
@@ -134,7 +125,7 @@ ship.get('/id/:ship', (req, res) => {
 
 	const numIdRegex = `^([a-zA-Z]+-)?${prefix ?? ''}0*${numID}g?$`;
 
-	const query = `SELECT ${selectCustomColumn} FROM ${itemsTableWithExtension('ship', 'id')} WHERE ${customConditionFromRequest(req)} AND idtype != 2 AND numid REGEXP ? ${extensionShort ? " AND (e.short = ? OR e.shortcommunity = ? OR e.shortwizkids = ?)" : ""} ${sortById};`;
+	const query = `SELECT ${selectCustomColumn} FROM ${itemsTableWithExtension('ship')} WHERE ${customConditionFromRequest(req)} AND idtype != 2 AND numid REGEXP ? ${extensionShort ? " AND (e.short = ? OR e.shortcommunity = ? OR e.shortwizkids = ?)" : ""} ${sortById};`;
 	const params = extensionShort ? [numIdRegex, extensionShort, extensionShort, extensionShort] : [numIdRegex];
 
 	poolQuery(query, params)
@@ -155,7 +146,7 @@ ship.get('/name/:ship', (req, res) => {
 		return res.json([]);
 	}
 
-	poolQuery(`SELECT ${selectCustomColumn} FROM ${itemsTableWithExtension('ship', 'name')} WHERE ${customConditionFromRequest(req)} AND idtype != 2 AND name LIKE ? ${sortByName};`, formatExactRegex(shipName))
+	poolQuery(`SELECT ${selectCustomColumn} FROM ${itemsTableWithExtension('ship')} WHERE ${customConditionFromRequest(req)} AND idtype != 2 AND name LIKE ? ${sortByName};`, formatExactRegex(shipName))
 	.then( results => {
 		res.json(results);
 	})
@@ -190,7 +181,7 @@ fort.get('/id/:fort', (req, res) => {
 
 	const numIdRegex = `^([a-zA-Z]+-)?${prefix ?? ''}0*${numID}$`;
 
-	const query = `SELECT ${selectCustomColumn} FROM ship WHERE ${customConditionFromRequest(req)} AND idtype = 2 AND numid REGEXP ? ${extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?)" : ""};`;
+	const query = `SELECT ${selectCustomColumn} FROM ${itemsTableWithExtension('ship')} WHERE ${customConditionFromRequest(req)} AND idtype = 2 AND numid REGEXP ? ${extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?)" : ""};`;
 	const params = extensionShort ? [numIdRegex, extensionShort, extensionShort, extensionShort] : [numIdRegex];
 
 	poolQuery(query, params)
@@ -210,7 +201,7 @@ fort.get('/name/:fort', (req, res) => {
 		return res.json([]);
 	}
 
-	poolQuery(`SELECT ${selectCustomColumn} FROM ship WHERE ${customConditionFromRequest(req)} AND idtype = 2 AND name LIKE ?;`, formatExactRegex(shipName))
+	poolQuery(`SELECT ${selectCustomColumn} FROM ${itemsTableWithExtension('ship')} WHERE ${customConditionFromRequest(req)} AND idtype = 2 AND name LIKE ?;`, formatExactRegex(shipName))
 	.then( results => {
 		res.json(results);
 	})
@@ -253,7 +244,7 @@ crew.get('/id/:crew', (req, res) => {
 
 	const numIdRegex = `^([a-zA-Z]+-)?${prefix ?? ''}0*${numID}-?[abc]?$`;
 
-	const query = `SELECT ${selectCustomColumn} FROM crew WHERE ${customConditionFromRequest(req)} AND numid REGEXP ? ${extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?)" : ""};`;
+	const query = `SELECT ${selectCustomColumn} FROM ${itemsTableWithExtension('crew')} WHERE ${customConditionFromRequest(req)} AND numid REGEXP ? ${extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?)" : ""};`;
 	const params = extensionShort ? [numIdRegex, extensionShort, extensionShort, extensionShort] : [numIdRegex];
 
 	poolQuery(query, params)
@@ -273,7 +264,7 @@ crew.get('/name/:crew', (req, res) => {
 		return res.json([]);
 	}
 
-	poolQuery(`SELECT ${selectCustomColumn} FROM crew WHERE ${customConditionFromRequest(req)} AND name LIKE ?;`, formatExactRegex(crewName))
+	poolQuery(`SELECT ${selectCustomColumn} FROM ${itemsTableWithExtension('crew')} WHERE ${customConditionFromRequest(req)} AND name LIKE ?;`, formatExactRegex(crewName))
 	.then( results => {
 		res.json(results);
 	})
@@ -315,7 +306,7 @@ treasure.get('/id/:treasure', (req, res) => {
 
 	const numIdRegex = `^${prefix ?? ''}0*${numID}[bg]?$`;
 
-	const query = `SELECT ${selectCustomColumn} FROM treasure WHERE ${customConditionFromRequest(req)} AND numid REGEXP ? ${extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?)" : ""};`;
+	const query = `SELECT ${selectCustomColumn} FROM ${itemsTableWithExtension('treasure')} WHERE ${customConditionFromRequest(req)} AND numid REGEXP ? ${extensionShort ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?)" : ""};`;
 	const params = extensionShort ? [numIdRegex, extensionShort, extensionShort, extensionShort] : [numIdRegex];
 
 	poolQuery(query, params)
@@ -335,7 +326,7 @@ treasure.get('/name/:treasure', (req, res) => {
 		return res.json([]);
 	}
 
-	poolQuery(`SELECT ${selectCustomColumn} FROM treasure WHERE ${customConditionFromRequest(req)} AND name LIKE ?;`, formatExactRegex(treasureName))
+	poolQuery(`SELECT ${selectCustomColumn} FROM ${itemsTableWithExtension('treasure')} WHERE ${customConditionFromRequest(req)} AND name LIKE ?;`, formatExactRegex(treasureName))
 	.then( results => {
 		res.json(results);
 	})
