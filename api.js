@@ -86,7 +86,7 @@ function customConditionFromRequest(req) {
 }
 
 function allItemsQuery(type, req) {
-	return `SELECT i.*, e.short as extensionname, f.nameimg as factionimg FROM ${type} as i LEFT JOIN extension as e ON e.id = i.idextension LEFT JOIN faction as f ON f.id = i.idfaction WHERE ${customConditionFromRequest(req)};`
+	return `SELECT ${selectCustomColumn}, e.short as extensionname, f.nameimg as factionimg FROM ${itemsTableWithExtension(type)} LEFT JOIN faction as f ON f.id = i.idfaction WHERE ${customConditionFromRequest(req)};`
 }
 
 function itemsTableWithExtension(type) {
@@ -415,7 +415,7 @@ keyword.get('/target', (req, res) => {
  */
 
 api.get('/faction', (req, res) => {
-    poolQuery("SELECT * FROM faction WHERE custom = 0;")
+    poolQuery(`SELECT * FROM faction as e WHERE ${customConditionFromRequest(req).replace('e.ispublic = 1', '1 = 1')}`)
     .then( results => {
 		res.json(results);
 	})
