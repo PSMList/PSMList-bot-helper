@@ -415,7 +415,7 @@ keyword.get('/target', (req, res) => {
  */
 
 api.get('/faction', (req, res) => {
-    poolQuery(`SELECT * FROM faction as e WHERE ${customConditionFromRequest(req).replace('e.ispublic = 1', '1 = 1')}`)
+    poolQuery(`SELECT * FROM faction as e WHERE ${customConditionFromRequest(req).replace('e.ispublic = 1', '1 = 1')};`)
     .then( results => {
 		res.json(results);
 	})
@@ -430,7 +430,13 @@ api.get('/faction', (req, res) => {
  */
 
 api.get('/extension', (req, res) => {
-    poolQuery(`SELECT e.* FROM extension as e WHERE ${customConditionFromRequest(req)}`)
+    poolQuery(`SELECT e.*, i1.name as imagebackground, i2.name as exticon
+							 FROM extension as e
+							 LEFT JOIN image as i1 ON i1.id = e.idimagebackgroundexpansion
+							 LEFT JOIN image as i2 ON i2.id = e.idimageiconexpansion
+							 WHERE ${customConditionFromRequest(req)};`
+							 .replace(/^ */gm, '')
+		)
     .then( results => {
 		res.json(results);
 	})
