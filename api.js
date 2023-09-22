@@ -87,10 +87,11 @@ function customConditionFromRequest(req) {
 }
 
 function allItemsQuery(type, req) {
+  const hasFaction = type !== "equipment" && type !== "treasure";
   return `SELECT ${selectCustomColumn}, e.short as extensionname ${
-    type !== "equipment" ? ", f.nameimg as factionimg" : ""
+    hasFaction ? ", f.nameimg as factionimg" : ""
   } FROM ${itemsTableWithExtension(type)} ${
-    type !== "equipment" ? "LEFT JOIN faction as f ON f.id = i.idfaction" : ""
+    hasFaction ? "LEFT JOIN faction as f ON f.id = i.idfaction" : ""
   } WHERE ${customConditionFromRequest(req)};`;
 }
 
@@ -109,7 +110,7 @@ ship.get("/", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -146,7 +147,7 @@ ship.get("/id/:ship", (req, res) => {
     .catch((err) => {
       // error will be an Error if one occurred during the query
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -168,7 +169,7 @@ ship.get("/name/:ship", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -214,7 +215,7 @@ fort.get("/id/:fort", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -236,7 +237,7 @@ fort.get("/name/:fort", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -251,7 +252,7 @@ crew.get("/", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -289,7 +290,7 @@ crew.get("/id/:crew", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -311,7 +312,7 @@ crew.get("/name/:crew", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -326,7 +327,7 @@ treasure.get("/", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -364,7 +365,7 @@ treasure.get("/id/:treasure", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -386,7 +387,7 @@ treasure.get("/name/:treasure", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -401,7 +402,7 @@ equipment.get("/", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -439,7 +440,7 @@ equipment.get("/id/:equipment", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -461,7 +462,7 @@ equipment.get("/name/:equipment", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -492,7 +493,7 @@ keyword.get("/", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -513,7 +514,7 @@ keyword.get("/name/:keyword", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -524,7 +525,7 @@ keyword.get("/category", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -535,7 +536,7 @@ keyword.get("/target", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -550,7 +551,7 @@ api.get("/faction", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -571,7 +572,7 @@ api.get("/extension", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -586,7 +587,7 @@ api.get("/rarity", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
@@ -601,7 +602,7 @@ api.get("/technicalshape", (req, res) => {
     })
     .catch((err) => {
       console.trace(err);
-      res.json({ error: err });
+      res.status(500).json({ error: err });
     });
 });
 
