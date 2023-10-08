@@ -3,27 +3,25 @@ import dbData from "../commons/dbdata.js";
 import fetch from "node-fetch";
 import { capitalize } from "./utils.js";
 
+const choiceTypes = [
+  { name: "All", value: "all" },
+  { name: "Ship, fort, submarine, flotilla, creature", value: "ship" },
+  { name: "Crew", value: "crew" },
+  { name: "Treasure", value: "treasure" },
+  { name: "Equipment", value: "equipment" },
+  { name: "Keyword", value: "keyword" },
+];
+
+const choiceTypesKeys = choiceTypes.map((choiceType) => choiceType.value);
+
 export const types = {
   values: {
-    id: ["all", "ship", "crew", "treasure", "equipment"],
-    name: ["all", "ship", "crew", "treasure", "equipment", "keyword"],
+    id: choiceTypesKeys.splice(-1),
+    name: choiceTypesKeys,
   },
   choices: {
-    id: [
-      { name: "All", value: "all" },
-      { name: "Ship, fort, submarine, flotilla, creature", value: "ship" },
-      { name: "Crew", value: "crew" },
-      { name: "Treasure", value: "treasure" },
-      { name: "Equipment", value: "equipment" },
-    ],
-    name: [
-      { name: "All", value: "all" },
-      { name: "Ship, fort, submarine, flotilla, creature", value: "ship" },
-      { name: "Crew", value: "crew" },
-      { name: "Treasure", value: "treasure" },
-      { name: "Equipment", value: "equipment" },
-      { name: "Keyword", value: "keyword" },
-    ],
+    id: choiceTypes.splice(-1),
+    name: choiceTypes,
   },
 };
 
@@ -73,10 +71,6 @@ function buildItemEmbed(type, data) {
     const extensionObject = dbData["extension"][item.idextension];
 
     const itemID = extensionObject.short + item.numid;
-
-    if (type === "fort") {
-      type = "ship";
-    }
 
     const url = `https://psmlist.com/public/${type}/${itemID}`;
 
@@ -233,9 +227,7 @@ function buildItemsEmbed(type, items) {
 
         const faction = dbData["faction"][item.idfaction];
         const extensionObject = dbData["extension"][item.idextension];
-        const url = `https://psmlist.com/public/${type !== "fort" ? type : "ship"}/${extensionObject.short}${
-          item.numid
-        }`;
+        const url = `https://psmlist.com/public/${type}/${extensionObject.short}${item.numid}`;
         const nameAndFaction = `${faction && faction.nameimg ? " \u200b " + emojis[faction.nameimg] : ""} \u200b ${
           item.name
         }`;

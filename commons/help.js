@@ -7,18 +7,10 @@ const slashHelp = ["ping", "search id", "search name", "list", "cost"].reduce(
   ""
 );
 
-const prefixHelp = [
-  "ping",
-  "search",
-  "ship",
-  "fort",
-  "crew",
-  "treasure",
-  "equipemnt",
-  "keyword",
-  "list",
-  "cost",
-].reduce((help, command) => `${help}${indentation}\`${prefix}${command}\`\n`, "");
+const prefixHelp = ["ping", "search", "ship", "crew", "treasure", "equipemnt", "keyword", "list", "cost"].reduce(
+  (help, command) => `${help}${indentation}\`${prefix}${command}\`\n`,
+  ""
+);
 
 function allHelp(prefix) {
   return `Type \`${prefix}help <command>\` to get detailed information.
@@ -50,12 +42,6 @@ export default function (command, prefix) {
         "Shows information about a ship based on its `name` or `id`.\n" +
         `\`${prefix}ship id <id>\` or \`${prefix}ship name <name>\`\n` +
         `Ex: \`${prefix}ship id oe059\``;
-      break;
-    case "fort":
-      helpMessage =
-        "Shows information about a fort based on its `name` or `id`.\n" +
-        `\`${prefix}fort id <id>\` or \`${prefix}fort name <name>\`\n` +
-        `Ex: \`${prefix}fort id rvu065\``;
       break;
     case "crew":
       helpMessage =
@@ -108,7 +94,7 @@ export default function (command, prefix) {
       helpTitle = "Help";
       helpMessage = allHelp(prefix);
   }
-  if (["search", "ship", "fort", "crew", "treasure", "equipment"].includes(command)) {
+  if (["search", "ship", "crew", "treasure", "equipment"].includes(command)) {
     helpMessage += `
                         Type \`${prefix}${command} name "<text>"\` (double quote) to do an exact research.
 

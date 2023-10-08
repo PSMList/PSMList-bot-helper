@@ -43,7 +43,6 @@ export async function execute(message) {
       case "search":
       case "ship":
       case "crew":
-      case "fort":
       case "equipment":
       case "treasure":
       case "keyword":

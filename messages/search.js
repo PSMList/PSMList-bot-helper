@@ -74,10 +74,7 @@ export default async function(message, command, searchType, args) {
         command === 'search' ?
             'all'
             :
-            command === 'fort' ?
-                'ship'
-                :
-                command,
+            command,
         input,
         custom
     );

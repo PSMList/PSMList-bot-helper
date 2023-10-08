@@ -39,9 +39,6 @@ app.use("/api", api);
 const ship = express.Router();
 api.use("/ship", ship);
 
-const fort = express.Router();
-api.use("/fort", fort);
-
 const crew = express.Router();
 api.use("/crew", crew);
 
@@ -135,7 +132,7 @@ ship.get("/id/:ship", (req, res) => {
 
   const query = `SELECT ${selectCustomColumn} FROM ${itemsTableWithExtension(
     "ship"
-  )} WHERE ${customConditionFromRequest(req)} AND i.idtype != 2 AND numid REGEXP ? ${
+  )} WHERE ${customConditionFromRequest(req)} AND numid REGEXP ? ${
     extensionShort ? " AND (e.short = ? OR e.shortcommunity = ? OR e.shortwizkids = ?)" : ""
   } ${sortById};`;
   const params = extensionShort ? [numIdRegex, extensionShort, extensionShort, extensionShort] : [numIdRegex];
@@ -162,74 +159,6 @@ ship.get("/name/:ship", (req, res) => {
     `SELECT ${selectCustomColumn} FROM ${itemsTableWithExtension("ship")} WHERE ${customConditionFromRequest(
       req
     )} AND i.idtype != 2 AND i.name LIKE ? ${sortByName};`,
-    formatExactRegex(shipName)
-  )
-    .then((results) => {
-      res.json(results);
-    })
-    .catch((err) => {
-      console.trace(err);
-      res.status(500).json({ error: err });
-    });
-});
-
-/*
- * /fort
- */
-
-fort.get("/", (req, res) => {
-  res.json({ error: "Not available!" });
-});
-
-fort.get("/id/:fort", (req, res) => {
-  const fortID = req.params.fort.substring(0, 10).toUpperCase();
-
-  if (fortID.length === 0 || fortID.length !== req.params.fort.length) {
-    return res.json([]);
-  }
-
-  const parts = idSplitRegex.exec(fortID);
-
-  if (!parts) {
-    return res.json([]);
-  }
-
-  const extensionShort = parts[1],
-    prefix = parts[2],
-    numID = parts[3];
-
-  const numIdRegex = `^([a-zA-Z]+-)?${prefix ?? ""}0*${numID}$`;
-
-  const query = `SELECT ${selectCustomColumn} FROM ${itemsTableWithExtension(
-    "ship"
-  )} WHERE ${customConditionFromRequest(req)} AND i.idtype = 2 AND numid REGEXP ? ${
-    extensionShort
-      ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?)"
-      : ""
-  };`;
-  const params = extensionShort ? [numIdRegex, extensionShort, extensionShort, extensionShort] : [numIdRegex];
-
-  poolQuery(query, params)
-    .then((results) => {
-      res.json(results);
-    })
-    .catch((err) => {
-      console.trace(err);
-      res.status(500).json({ error: err });
-    });
-});
-
-fort.get("/name/:fort", (req, res) => {
-  const fortName = req.params.fort.substring(0, 30).toUpperCase();
-
-  if (fortName.length === 0 || fortName.length !== req.params.fort.length) {
-    return res.json([]);
-  }
-
-  poolQuery(
-    `SELECT ${selectCustomColumn} FROM ${itemsTableWithExtension("ship")} WHERE ${customConditionFromRequest(
-      req
-    )} AND i.idtype = 2 AND i.name LIKE ?;`,
     formatExactRegex(shipName)
   )
     .then((results) => {
