@@ -1,107 +1,29 @@
 import { Events } from "discord.js";
-import { prefix } from "../config.js";
-import cost from "../messages/cost.js";
-import help from "../messages/help.js";
-import list from "../messages/list.js";
-import ping from "../messages/ping.js";
-import search from "../messages/search.js";
-import { replyWithEmbeds, sanitize } from "../commons/utils.js";
+import { replyWithEmbeds } from "../commons/utils.js";
 
 export const name = Events.MessageCreate;
 export const once = false;
 
-export async function execute(message) {
+export function execute(message) {
   try {
     // stop if the message is from a bot
     if (message.author.bot) {
       return;
     }
-    // stop if message is too small or prefix not the one this bot expects
-    if (message.content.slice(0, prefix.length).toLowerCase() !== prefix) {
-      return;
-    }
 
-    message.channel.send(
-      replyWithEmbeds({
-        title: `:warning: Support for \`${prefix.trim()}\` commands will be dropped on November, 1st`,
-        color: 0xff0000,
-        description: `Please use "slash commands" instead. Type \`/help\` to check available slash commands.
-				More information on [this link](https://psmlist.com/public/blog/discord_slash_commands_update).`,
-      })
-    );
-
-    const commandBody = sanitize(message.content.slice(prefix.length).toLowerCase());
-
-    const args = commandBody.replace(/ +/g, " ").split(" ");
-    // switch command and args if firts argument is 'help'
-    const command = args[1] && args[1] === "help" ? args[1] : args.shift();
-
-    switch (command) {
-      case "help":
-        return help(message, args[0]);
-
-      case "search":
-      case "ship":
-      case "crew":
-      case "equipment":
-      case "treasure":
-      case "keyword":
-        if (command === "search" && args.length === 0) {
-          return message.channel.send(
-            replyWithEmbeds({
-              description: `More content is available on [PSMList.com](https://psmlist.com/public/)`,
-            })
-          );
-        }
-        // get search type and remove it from args for future processing
-        const searchType = args.shift();
-        if (command !== "keyword" || searchType === "name") {
-          return search(message, command, searchType, args);
-        } else if (!["categories", "targets"].includes(searchType)) {
-          return message.channel.send(
-            replyWithEmbeds({
-              title: "No matching command",
-              description: `Unable to understand your request. Type \`${prefix}help\` to show the list of available commands.`,
-            })
-          );
-        }
-
-        return list(message, searchType);
-      case "factions":
-      case "expansions":
-      case "extensions":
-      case "rarities":
-        return list(message, command);
-
-      case "ping":
-        return ping(message);
-
-      case "udc":
-      case "simcost":
-        message.channel.send(
-          replyWithEmbeds({
-            title: `Falling back to \`${prefix}cost\``,
-            description: "`udc`and `simcost`commands are merged within `cost`.",
-          })
-        );
-      case "cost":
-        return cost(message, args);
-
-      default:
-        return message.channel.send(
-          replyWithEmbeds({
-            title: "No matching command",
-            description: `Unable to understand your request. Type \`${prefix}help\` to show the list of available commands.`,
-          })
-        );
+    // stop if the message doesn't start with prefix
+    if (message.content.startsWith("psm")) {
+      message.channel.send(
+        replyWithEmbeds({
+          title: `Support for old \`psm\` commands has been dropped in favor of slash-commands`,
+          color: 0xff0000,
+          description: `All your favorites features are still available!
+          Type \`/help\` to get the full list of commands.
+          More information [here](https://psmlist.com/public/blog/discord_slash_commands_update).`,
+        })
+      );
     }
   } catch (err) {
     console.log(err);
-    return message.channel.send(
-      replyWithEmbeds({
-        title: "Unexpected internal error",
-        description: "Please try again later or contact the bot maintainers.",
-      })
-    );
   }
 }
