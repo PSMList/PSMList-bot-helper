@@ -338,6 +338,13 @@ async function getApiData(command, type, query, custom) {
 }
 
 export default async function search(command, type, query, custom) {
+  if (query.includes(" ")) {
+    return {
+      title: "Wrong input format",
+      description: "Please provide only one ID per research.",
+    };
+  }
+
   const fallback = !types.values[command].includes(type);
   if (fallback) {
     type = "all";

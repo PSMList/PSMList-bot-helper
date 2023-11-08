@@ -98,6 +98,7 @@ export function replyWithEmbeds(embeds) {
 
 export function sanitize(str) {
     return str
+        .trim()
         // replace alternative apostrophes for the most widely used one
         .replace(/‘|’|`/g, "'")
         // remove non-classical characters (injections)
