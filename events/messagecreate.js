@@ -4,6 +4,8 @@ import { replyWithEmbeds } from "../commons/utils.js";
 export const name = Events.MessageCreate;
 export const once = false;
 
+const oldCommandsRegex = /^psm (help|search|ship|crew|equipment|treasure|keyword|udc|simcost)/i;
+
 export function execute(message) {
   try {
     // stop if the message is from a bot
@@ -12,7 +14,7 @@ export function execute(message) {
     }
 
     // stop if the message doesn't start with prefix
-    if (message.content.startsWith("psm")) {
+    if (oldCommandsRegex.test(message.content)) {
       message.channel.send(
         replyWithEmbeds({
           title: `Support for old \`psm\` commands has been dropped in favor of slash-commands`,

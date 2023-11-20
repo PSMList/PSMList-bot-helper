@@ -84,7 +84,7 @@ function customConditionFromRequest(req) {
 }
 
 function allItemsQuery(type, req) {
-  const hasFaction = type !== "equipment" && type !== "treasure";
+  const hasFaction = ["ship", "crew"].includes(type);
   return `SELECT ${selectCustomColumn}, e.short as extensionname ${
     hasFaction ? ", f.nameimg as factionimg" : ""
   } FROM ${itemsTableWithExtension(type)} ${
