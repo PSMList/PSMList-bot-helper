@@ -13,7 +13,7 @@ const bot = new Client({
     GatewayIntentBits.MessageContent,
   ],
   presence: {
-    activities: [{ name: "/help", type: ActivityType.Custom }],
+    activities: [{ state: "/help", name: "PSMList Bot Helper DEV", type: ActivityType.Custom }],
   },
 });
 
