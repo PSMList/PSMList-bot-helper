@@ -9,30 +9,34 @@ const choiceTypes = [
   { name: "Crew", value: "crew" },
   { name: "Treasure", value: "treasure" },
   { name: "Equipment", value: "equipment" },
-  { name: "Keyword", value: "keyword" },
 ];
 
-const choiceTypesKeys = choiceTypes.map((choiceType) => choiceType.value);
+const choiceNameTypes = [...choiceTypes, { name: "Keyword", value: "keyword" }];
+
+const choiceTypesTitles = Object.fromEntries(
+  choiceNameTypes.map((choice) => [choice.value, choice.name])
+);
 
 export const types = {
   values: {
-    id: choiceTypesKeys.splice(-1),
-    name: choiceTypesKeys,
+    id: choiceTypes.map((choice) => choice.value),
+    name: choiceNameTypes.map((choice) => choice.value),
   },
   choices: {
-    id: choiceTypes.splice(-1),
-    name: choiceTypes,
+    id: choiceTypes,
+    name: choiceNameTypes,
   },
 };
 
 export const CUSTOM_DISCLAIMER = "\\* is made by the community";
 
 function truncateField(text, moreUrl) {
-  const defaultText = text || "";
-  const trimmedText =
-    defaultText.length < 300 ? defaultText : `${defaultText.slice(0, 300)}... [See complete description](${moreUrl})`;
+  text = text || "";
 
-  return trimmedText;
+  if (text.length < 300) {
+    return text;
+  }
+  return `${text.slice(0, 300)}... [See complete description](${moreUrl})`;
 }
 
 function plural(string, number) {
@@ -51,14 +55,24 @@ function buildItemEmbed(type, data) {
 
   if (type === "keyword") {
     const item = data[0];
-    const url = `https://www.psmlist.com/public/keyword/detail?kw=${encodeURI(item.shortname)}`;
+    const url = `https://psmlist.com/public/keyword/detail?kw=${encodeURI(
+      item.shortname
+    )}`;
     embeds.push({
       title: item.shortname,
       url,
       fields: [
         { name: "Cost", value: plural("point", item.cost), inline: true },
-        { name: "Category", value: dbData["keyword/category"][item.idkeywordtype].name, inline: true },
-        { name: "Target", value: dbData["keyword/target"][item.idkeywordtarget].name, inline: true },
+        {
+          name: "Category",
+          value: dbData["keyword/category"][item.idkeywordtype].name,
+          inline: true,
+        },
+        {
+          name: "Target",
+          value: dbData["keyword/target"][item.idkeywordtarget].name,
+          inline: true,
+        },
         { name: "Effect", value: truncateField(item.effect, url) },
       ],
     });
@@ -80,15 +94,14 @@ function buildItemEmbed(type, data) {
 
     const itemEmbed = {
       title: `${item.name} (${itemID})`,
-      color: parseInt(dbData["rarity"][item.idrarity].colorhex, 16),
+      color: parseInt(dbData["rarity"][item.idrarity]?.colorhex, 16),
       url,
-      image: { url: `https://psmlist.com/public/img/gameicons/full/${extensionObject.short}/${item.numid}.jpg` },
+      image: {
+        url: `https://psmlist.com/public/img/gameicons/full/${extensionObject.short}/${item.numid}.jpg`,
+      },
     };
 
     const fields = [];
-
-    const defaultAptitude = truncateField(item.defaultaptitude, url);
-    const defaultLore = truncateField(item.defaultlore, url);
 
     switch (type) {
       case "ship":
@@ -110,7 +123,12 @@ function buildItemEmbed(type, data) {
               " ** \u200b \u200b " +
               emojis.cannon +
               " " +
-              item.cannons.match(/\w{2}/g).reduce((cannons, cannon) => cannons + " \u200b " + emojis[cannon], ""),
+              item.cannons
+                .match(/\w{2}/g)
+                .reduce(
+                  (cannons, cannon) => cannons + " \u200b " + emojis[cannon],
+                  ""
+                ),
           });
         } else {
           fields.push({
@@ -143,7 +161,12 @@ function buildItemEmbed(type, data) {
               " \u200b \u200b " +
               emojis.cannon +
               " " +
-              item.cannons.match(/\w{2}/g).reduce((cannons, cannon) => cannons + " \u200b " + emojis[cannon], ""),
+              item.cannons
+                .match(/\w{2}/g)
+                .reduce(
+                  (cannons, cannon) => cannons + " \u200b " + emojis[cannon],
+                  ""
+                ),
           });
         }
         break;
@@ -168,23 +191,31 @@ function buildItemEmbed(type, data) {
           name: capitalize(type),
         };
         fields.push({
-          name: prefix + " \u200b " + extensionObject.name + " \u200b - \u200b " + extensionObject.short,
-          value: type === "equipment" ? "**" + plural("point", item.points) + " **" : "",
+          name:
+            prefix +
+            " \u200b " +
+            extensionObject.name +
+            " \u200b - \u200b " +
+            extensionObject.short,
+          value:
+            type === "equipment"
+              ? "**" + plural("point", item.points) + " **"
+              : "",
         });
         break;
     }
 
-    if (defaultAptitude) {
+    if (item.defaultaptitude) {
       fields.push({
         name: "Ability",
-        value: defaultAptitude,
+        value: truncateField(item.defaultaptitude, url),
       });
     }
 
-    if (defaultLore) {
+    if (item.defaultlore) {
       fields.push({
         name: "Flavor text",
-        value: defaultLore,
+        value: truncateField(item.defaultlore, url),
       });
     }
 
@@ -209,7 +240,7 @@ function buildItemEmbed(type, data) {
 
 function buildItemsEmbed(type, items) {
   const fields = [];
-  let title = types.choices.name.find((choice) => choice.value === type).name;
+  let title = choiceTypesTitles[type] ?? "";
 
   let hasCustomItem = false;
 
@@ -223,20 +254,25 @@ function buildItemsEmbed(type, items) {
           hasCustomItem = true;
         }
 
+        const faction = dbData["faction"][item.faction];
+        const factionName = faction?.nameimg
+          ? ` \u200b ${emojis[faction.nameimg]}`
+          : "";
+
+        const itemName = item.name ? ` \u200b ${item.name}` : "";
+
         const customPrefix = item.custom ? "\\* " : "";
 
-        const faction = dbData["faction"][item.idfaction];
         const extensionObject = dbData["extension"][item.idextension];
         const url = `https://psmlist.com/public/${type}/${extensionObject.short}${item.numid}`;
-        const nameAndFaction = `${faction && faction.nameimg ? " \u200b " + emojis[faction.nameimg] : ""} \u200b ${
-          item.name
-        }`;
 
-        return `${accu}${customPrefix}[${extensionObject.short}${item.numid}](${url})${nameAndFaction}\n`;
+        return `${accu}${customPrefix}[${extensionObject.short}${item.numid}](${url})${factionName}${itemName}\n`;
       }, "");
     } else {
       output = items.slice(i, i + 8).reduce((accu, item) => {
-        const url = `https://www.psmlist.com/public/keyword/detail?kw=${encodeURI(item.shortname)}`;
+        const url = `https://psmlist.com/public/keyword/detail?kw=${encodeURI(
+          item.shortname
+        )}`;
         return `${accu}[${item.shortname}](${url})\n`;
       }, "");
     }
@@ -257,88 +293,110 @@ function buildItemsEmbed(type, items) {
 
 function setResults(input, data) {
   // get the amount of items to display
-  const length = input === "all" ? data.reduce((total, _data) => total + _data.length, 0) : data.length;
+  const itemsCount =
+    input === "all"
+      ? data.reduce((total, items) => total + items.length, 0)
+      : data.length;
 
-  if (length !== 0) {
-    // create an associative array of data by item type
-    const dataByType = {};
-    let typesCount = 0;
-    if (input === "all") {
-      for (let typeID = 0; typeID < data.length; typeID++) {
-        const array = data[typeID];
-        const type = types.values.name[typeID + 1];
-        // avoid creating an empty embed if there is no value for this item type
-        if (array.length > 0) {
-          dataByType[type] = array;
-          typesCount++;
-        }
-      }
-    } else {
-      typesCount = 1;
-      dataByType[input] = data;
-    }
+  if (!itemsCount) {
+    const type = choiceTypesTitles[input] ?? "";
 
-    const extensions = dbData["extension"];
-
-    // check if there would be one item to show or two corresponding to crew from the same card (with same extension and numid)
-    const isSingleEmbed =
-      // more than one type or more than two items means multi embed
-      typesCount > 1 || length > 2
-        ? false
-        : // one item or two which match type specific conditions
-          length === 1 ||
-          // crew from the same card
-          (dataByType["crew"] &&
-            dataByType["crew"][0].idextension === dataByType["crew"][1].idextension &&
-            dataByType["crew"][0].numid.match("[^a]+")[0] === dataByType["crew"][1].numid.match("[^b]+")[0]) ||
-          // ships from both non Unlimited and Unlimited extensions
-          (dataByType["ship"] &&
-            (extensions[dataByType["ship"][0].idextension].short + "U" ===
-              extensions[dataByType["ship"][1].idextension].short ||
-              extensions[dataByType["ship"][0].idextension].short ===
-                extensions[dataByType["ship"][1].idextension].short + "U"));
-
-    // keep only the ship not from Unlimited extension
-    if (isSingleEmbed && dataByType["ship"] && dataByType["ship"].length === 2) {
-      dataByType["ship"] = [
-        !extensions[dataByType["ship"][0].idextension].short.endsWith("U")
-          ? dataByType["ship"][0]
-          : dataByType["ship"][1],
-      ];
-    }
-    // create one embed for each type of item
-    const embeds = [];
-    for (let type in dataByType) {
-      const array = dataByType[type];
-      // if data contains only one item or two successive crew
-      embeds.push(
-        ...(isSingleEmbed
-          ? // create detailed embed
-            buildItemEmbed(type, array)
-          : buildItemsEmbed(type, array))
-      );
-    }
-    return embeds;
+    return [
+      {
+        title: "No data match",
+        description: `Provided input did not match any ${
+          input === "all" ? "type" : type.toLowerCase()
+        }.`,
+      },
+    ];
   }
-  const type = types.choices.name.find((choice) => choice.value === input).name;
-  return [
-    {
-      title: "No data match",
-      description: `Provided input did not match any ${input === "all" ? "type" : type.toLowerCase()}.`,
-    },
-  ];
+
+  // create an associative array of data by item type
+  const dataByType = {};
+  let typesCount = 0;
+  if (input === "all") {
+    for (let typeID = 0; typeID < data.length; typeID++) {
+      const array = data[typeID];
+      const type = types.values.name[typeID + 1];
+      // avoid creating an empty embed if there is no value for this item type
+      if (array.length > 0) {
+        dataByType[type] = array;
+        typesCount++;
+      }
+    }
+  } else {
+    typesCount = 1;
+    dataByType[input] = data;
+  }
+
+  const extensions = dbData["extension"];
+
+  const crew = dataByType["crew"];
+  const firstCrew = crew?.[0];
+  const secondCrew = crew?.[1];
+
+  const ships = dataByType["ship"];
+  const firstShip = ships?.[0];
+  const secondShip = ships?.[1];
+  const firstShipExtension = extensions[firstShip?.idextension];
+  const secondShipExtension = extensions[secondShip?.idextension];
+
+  // check if there would be one item to show or two corresponding to crew from the same card (with same extension and numid)
+  const isSingleEmbed =
+    // more than one type or more than two items means multi embed
+    typesCount > 1 || itemsCount > 2
+      ? false
+      : // one item or two which match type specific conditions
+        itemsCount === 1 ||
+        // crew from the same card
+        (crew &&
+          firstCrew.idextension === secondCrew.idextension &&
+          firstCrew.numid.match(/^[^a]+/)[0] ===
+            secondCrew.numid.match(/^[^b]+/)[0]) ||
+        // ships from both non Unlimited and Unlimited extensions
+        (ships &&
+          firstShipExtension.short.match(/[^U]+/)[0] ===
+            secondShipExtension.short.match(/[^U]+/)[0]);
+
+  // keep only the ship not from Unlimited extension
+  if (isSingleEmbed && (ships?.length ?? 0) === 2) {
+    dataByType["ship"] = [
+      !firstShipExtension.short.endsWith("U") ? firstShip : secondShip,
+    ];
+  }
+
+  // create one embed for each type of item
+  const embeds = [];
+  for (let type in dataByType) {
+    const array = dataByType[type];
+    // if data contains only one item or two successive crew
+    embeds.push(
+      ...(isSingleEmbed
+        ? // create detailed embed
+          buildItemEmbed(type, array)
+        : buildItemsEmbed(type, array))
+    );
+  }
+
+  return embeds;
 }
 
 async function getApiData(command, type, query, custom) {
   return type === "all"
-    ? Promise.all(types.values[command].slice(1).map((type) => getApiData(command, type, query, custom)))
-    : await fetch(`${API_URI}/${type}/${command}/${query}${custom ? "?custom=" + custom : ""}`).then((res) =>
-        res.json()
-      );
+    ? Promise.all(
+        types.values[command]
+          .slice(1)
+          .map((type) => getApiData(command, type, query, custom))
+      )
+    : await fetch(
+        `${API_URI}/${type}/${command}/${query}${
+          custom ? "?custom=" + custom : ""
+        }`
+      ).then((res) => res.json());
 }
 
 export default async function search(command, type, query, custom) {
-  if (query.includes(" ")) {
+  if (command.includes("id") && query.includes(" ")) {
     return {
       title: "Wrong input format",
       description: "Please provide only one ID per research.",

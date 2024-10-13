@@ -13,13 +13,15 @@ const helpMessages = {
       ""
     )}
     For further help, please check the [documentation](https://psmlist.com/public/blog/documentation_psmlisthelper) on psmlist.com.`),
-  "search name": trim(`Shows information about an item in PSMList databased based on its \`name\`
+  "search name":
+    trim(`Shows information about an item in PSMList databased based on its \`name\`
     \`/search name <type> <name>\` or \`/search name <type> <name> <custom>\`
     Ex: \`/search name ship HMS\`
     Ex: \`/search name crew Cheval include\`
     
     Type \`/search name <type> "<name>"\` with double quotes to do an exact research.`),
-  "search id": trim(`Shows information about an item in PSMList databased based on its \`id\`
+  "search id":
+    trim(`Shows information about an item in PSMList databased based on its \`id\`
     \`/search id <type> <id>\` or \`/search id <type> <id> <custom>\`
     Ex: \`/search id ship oe059\`
     Ex: \`/search id crew 63 include\`
@@ -48,7 +50,8 @@ const helpMessages = {
 };
 
 export default function (command, param) {
-  const helpTitle = command === "help" ? "Help" : `Help for \`${command}\` command`;
+  const helpTitle =
+    command === "help" ? "Help" : `Help for \`${command}\` command`;
 
   let helpMessage = helpMessages[command];
 

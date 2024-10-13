@@ -2,7 +2,12 @@ import "./api.js";
 import * as commands from "./interactions/index.js";
 import * as events from "./events/index.js";
 
-import { ActivityType, Client, Collection, GatewayIntentBits } from "discord.js";
+import {
+  ActivityType,
+  Client,
+  Collection,
+  GatewayIntentBits,
+} from "discord.js";
 import { BOT_TOKEN } from "./secret.js";
 
 const bot = new Client({
@@ -13,7 +18,13 @@ const bot = new Client({
     GatewayIntentBits.MessageContent,
   ],
   presence: {
-    activities: [{ state: "/help", name: "PSMList Bot Helper DEV", type: ActivityType.Custom }],
+    activities: [
+      {
+        state: "/help",
+        name: "PSMList Bot Helper DEV",
+        type: ActivityType.Custom,
+      },
+    ],
   },
 });
 
@@ -25,7 +36,9 @@ for (const key in commands) {
   if ("data" in command && "execute" in command) {
     bot.commands.set(command.data.name, command);
   } else {
-    console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+    console.log(
+      `[WARNING] The command "${key}" is missing a required "data" or "execute" property.`
+    );
   }
 }
 

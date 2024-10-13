@@ -4,7 +4,8 @@ import { replyWithEmbeds } from "../commons/utils.js";
 export const name = Events.MessageCreate;
 export const once = false;
 
-const oldCommandsRegex = /^psm (help|search|ship|crew|equipment|treasure|keyword|udc|simcost)/i;
+const oldCommandsRegex =
+  /^psm (help|search|ship|crew|treasure|equipment|keyword|udc|simcost)/i;
 
 export function execute(message) {
   try {

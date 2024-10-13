@@ -1,18 +1,15 @@
-import { SlashCommandBuilder } from 'discord.js';
-import ping from '../commons/ping.js';
-import { replyWithEmbeds } from '../commons/utils.js';
+import { SlashCommandBuilder } from "discord.js";
+import ping from "../commons/ping.js";
+import { replyWithEmbeds } from "../commons/utils.js";
 
-export const data =
-    new SlashCommandBuilder()
-		.setName('ping')
-		.setDescription('Test your ping latency for fun!')
+export const data = new SlashCommandBuilder()
+  .setName("ping")
+  .setDescription("Test your ping latency for fun!");
 
 export async function execute(interaction) {
-    const embed = ping(interaction.createdTimestamp);
+  const embed = ping(interaction.createdTimestamp);
 
-    const reply  = replyWithEmbeds(embed);
-    reply.ephemeral = true;
-    interaction.reply(
-        reply
-    );
+  const reply = replyWithEmbeds(embed);
+  reply.ephemeral = true;
+  interaction.reply(reply);
 }

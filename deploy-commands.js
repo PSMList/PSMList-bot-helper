@@ -19,12 +19,19 @@ const rest = new REST({ version: "10" }).setToken(BOT_TOKEN);
 (async () => {
   for (const GUILD_ID of Object.values(GUILDS).map((guild) => guild.id)) {
     try {
-      console.log(`Started refreshing ${commandsList.length} application (/) commands.`);
+      console.log(
+        `Started refreshing ${commandsList.length} application (/) commands.`
+      );
 
       // The put method is used to fully refresh all commands in the guild with the current set
-      const data = await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), { body: commandsList });
+      const data = await rest.put(
+        Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),
+        { body: commandsList }
+      );
 
-      console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+      console.log(
+        `Successfully reloaded ${data.length} application (/) commands.`
+      );
     } catch (error) {
       // And of course, make sure you catch and log any errors!
       console.error(error);

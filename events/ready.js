@@ -6,7 +6,10 @@ export const once = true;
 
 export const millisecondsInDay = 24 * 60 * 60 * 1000;
 const expiresDate = new Date("10-20-2023");
-const formatter = new Intl.RelativeTimeFormat("en-us", { style: "long", numeric: "auto" });
+const formatter = new Intl.RelativeTimeFormat("en-us", {
+  style: "long",
+  numeric: "auto",
+});
 
 function formatDaysAgo(date) {
   let duration = date - new Date();
@@ -17,13 +20,15 @@ function formatDaysAgo(date) {
 export function execute(bot) {
   console.log(`Ready! Logged in as ${bot.user.tag}`);
 
-  // return;
+  return;
 
   function showExpires() {
     for (const GUILD of Object.values(GUILDS)) {
       const guild = bot.guilds.cache.get(GUILD.id);
       if (!guild) continue;
-      const channel = guild.channels.cache.find((channel) => channel.name.startsWith(GUILD.channel));
+      const channel = guild.channels.cache.find((channel) =>
+        channel.name.startsWith(GUILD.channel)
+      );
       if (!channel) continue;
       channel.send({
         embeds: [
