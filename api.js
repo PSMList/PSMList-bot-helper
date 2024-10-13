@@ -340,6 +340,60 @@ equipment.get("/name/:equipment", (req, res) => {
 });
 
 /*
+ * /island
+ */
+
+island.get("/", (req, res) => {
+  poolQuery(res, allItemsQuery("island", req));
+});
+
+island.get("/id/:island", (req, res) => {
+  const islandID = req.params.island.toUpperCase();
+
+  if (islandID.length > 10) {
+    return res.json([]);
+  }
+
+  const parts = idSplitRegex.exec(islandID);
+
+  if (!parts) {
+    return res.json([]);
+  }
+
+  const extensionShort = parts[1],
+    prefix = parts[2],
+    numID = parts[3];
+
+  const numIdRegex = `^${prefix ?? ""}0*${numID}i?$`;
+
+  const terrainQuery =
+    "SELECT island_terrain_id FROM island_island_terrain WHERE island_id = i.id LIMIT 1";
+
+  const query = `SELECT ${selectCustomColumn},
+    (SELECT name FROM image WHERE image.id = i.idimageiconisland) as imageiconisland,
+    (${terrainQuery}) as island_terrain_id_1,
+    (${terrainQuery} OFFSET 1) as island_terrain_id_2,
+    ci.slugname
+    FROM ${itemsTableWithExtension("island")}
+    INNER JOIN collectible_item as ci ON ci.id = i.id
+    WHERE ${customConditionFromRequest(req)} AND numid REGEXP ? ${
+    extensionShort
+      ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?)"
+      : ""
+  };`;
+
+  const params = extensionShort
+    ? [numIdRegex, extensionShort, extensionShort, extensionShort]
+    : [numIdRegex];
+
+  poolQuery(res, query, params);
+});
+
+island.get("/terrain", (req, res) => {
+  poolQuery(res, "SELECT * FROM island_terrain;");
+});
+
+/*
  * /event
  */
 
@@ -419,8 +473,8 @@ api.get("/extension", (req, res) => {
     res,
     `SELECT e.*
       ${iconsSelect}
-							 FROM extension as e
-							 WHERE ${customConditionFromRequest(req)};`.replace(/^ */gm, "")
+      FROM extension as e
+      WHERE ${customConditionFromRequest(req)};`.replace(/^ */gm, "")
   );
 });
 

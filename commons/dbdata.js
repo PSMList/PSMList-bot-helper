@@ -7,6 +7,7 @@ export const tablesTitleMap = {
   rarity: "Rarities",
   "keyword/category": "Keyword categories",
   "keyword/target": "Keyword targets",
+  "island/terrain": "Island terrains",
 };
 
 export const tables = Object.keys(tablesTitleMap);
@@ -60,6 +61,28 @@ async function loadData(type) {
       for (let { id, name } of data) {
         if (id && name) {
           exports[id] = { name };
+        }
+      }
+      break;
+    case "island/terrain":
+      for (let {
+        id,
+        name,
+        nameimg,
+        slugname,
+        imageiconisland,
+        island_terrain_id_1,
+        island_terrain_id_2,
+      } of data) {
+        if (id && name) {
+          exports[id] = {
+            name,
+            nameimg,
+            slugname,
+            imageiconisland,
+            island_terrain_id_1,
+            island_terrain_id_2,
+          };
         }
       }
       break;

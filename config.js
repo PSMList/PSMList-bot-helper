@@ -56,4 +56,13 @@ export const emojis = {
   "020202": "<:superrare:865962964356300800>",
   B87333: "<:limited:865962964267958282>",
   "3DB917": "<:special:865962964343717898>",
+  fog_bank: "<:fog_bank:1295018723429847141>",
+  great_turtle: "<:great_turtle:1295018724805574678>",
+  iceberg: "<:iceberg:1295018726634033243>",
+  island: "<:island:1295018728077136025>",
+  mysterious_island: "<:mysterious_island:1295018729784213545>",
+  reef: "<:reef:1295018731180789801>",
+  sargasso_sea: "<:sargasso_sea:1295018732573163631>",
+  trade_current: "<:trade_current:1295018734318260315>",
+  whirlpool: "<:whirlpool:1295018735949844582>",
 };

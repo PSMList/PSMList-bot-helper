@@ -35,7 +35,8 @@ const helpMessages = {
     ${indentation}\`factions\`: Official factions for ships and crew
     ${indentation}\`rarities\`: Rarities on cards
     ${indentation}\`keyword categories\`: Keyword categories
-    ${indentation}\`keyword target\`: Possible targets for keywords`),
+    ${indentation}\`keyword target\`: Possible targets for keywords
+    ${indentation}\`island terrains\`: Terrain types with their respective icons`),
   cost: trim(`Calculates the point value of a ship based on the [UDC](https://psmlist.com/public/udc_calculator) and [SimCost](https://psmlist.com/public/simcost_calculator) algorithms.
 
     Type \`/cost <masts> <cargo> <speed> <cannons>\`

@@ -5,7 +5,7 @@ export const name = Events.MessageCreate;
 export const once = false;
 
 const oldCommandsRegex =
-  /^psm (help|search|ship|crew|treasure|equipment|keyword|udc|simcost)/i;
+  /^psm (help|search|ship|crew|treasure|equipment|island|keyword|udc|simcost)/i;
 
 export function execute(message) {
   try {

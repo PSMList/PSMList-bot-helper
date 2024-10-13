@@ -8,25 +8,25 @@ import dbData, {
 const embeds = {};
 
 function sortByName(a, b) {
-    return a.name < b.name ? -1 : 1;   
+  return a.name < b.name ? -1 : 1;
 }
 
 function sortById(a, b) {
-    return a.id < b.id ? -1 : 1;   
+  return a.id < b.id ? -1 : 1;
 }
 
 (async () => {
-    await dbDataPromise;
+  await dbDataPromise;
 
-    for (const table of tables) {
+  for (const table of tables) {
     const embed = (embeds[table] = {
       title: tablesTitleMap[table],
     });
 
-        switch (table) {
+    switch (table) {
       case "faction":
         embed.description = Object.values(dbData["faction"])
-                        .sort(sortByName)
+          .sort(sortByName)
           .reduce(
             (output, faction) =>
               output +
@@ -36,10 +36,10 @@ function sortById(a, b) {
               "\n",
             ""
           );
-                break;
+        break;
       case "extension":
         embed.description = Object.values(dbData["extension"])
-                    // .sort(sortByName)
+          // .sort(sortByName)
           .reduce(
             (output, extension) =>
               output +
@@ -55,46 +55,55 @@ function sortById(a, b) {
               "\n",
             ""
           );
-                break;
+        break;
       case "rarity":
         embed.description = Object.values(dbData["rarity"])
-                    .sort(sortById)
+          .sort(sortById)
           .reduce(
             (output, rarity) =>
               `${output}${emojis[rarity.colorhex]} ${rarity.name}\n`,
             ""
           );
-                break;
+        break;
       case "keyword/category":
         embed.description = Object.values(dbData["keyword/category"])
-                    .sort(sortByName)
+          .sort(sortByName)
           .reduce(
             (output, kw_category) => `${output} ${kw_category.name}\n`,
             ""
           );
-                break;
+        break;
       case "keyword/target":
         embed.description = Object.values(dbData["keyword/target"])
-                    .sort(sortByName)
-                    .reduce((output, kw_target) => `${output} ${kw_target.name}\n`, "");
-                break;
-        }
+          .sort(sortByName)
+          .reduce((output, kw_target) => `${output} ${kw_target.name}\n`, "");
+        break;
+      case "island/terrain":
+        embed.description = Object.values(dbData["island/terrain"])
+          .sort(sortByName)
+          .reduce(
+            (output, terrain) =>
+              `${output}${emojis[terrain.nameimg]} ${terrain.name}\n`,
+            ""
+          );
+        break;
     }
+  }
 })();
 
 export default function list(table) {
-    if (!tables.includes(table)) {
-        return {
+  if (!tables.includes(table)) {
+    return {
       title: "Wrong input provided",
       description:
         "Please use the list of availables choices (click in the `which` input)",
     };
-    }
+  }
 
-    const data = embeds[table];
+  const data = embeds[table];
 
-    return {
-        title: data.title,
-        description: data.description,
-    };
+  return {
+    title: data.title,
+    description: data.description,
+  };
 }
