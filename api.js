@@ -495,6 +495,14 @@ api.get("/technicalshape", (req, res) => {
 });
 
 /*
+ * /shiptype
+ */
+
+api.get("/shiptype", (req, res) => {
+  poolQuery(res, "SELECT * FROM type;");
+});
+
+/*
  * not found
  */
 
