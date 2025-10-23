@@ -381,7 +381,7 @@ island.get("/id/:island", (req, res) => {
   const query = `SELECT ${selectColumns("island")},
     (SELECT name FROM image WHERE image.id = i.idimageiconisland) as imageiconisland,
     (${terrainQuery}) as island_terrain_id_1,
-    (${terrainQuery} OFFSET 1) as island_terrain_id_2)
+    (${terrainQuery} OFFSET 1) as island_terrain_id_2
     FROM ${extendedItemsTable("island")}
     WHERE ${customConditionFromRequest(req)} AND ${filterExtension(
     extensionShort

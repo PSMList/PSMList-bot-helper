@@ -437,16 +437,14 @@ function setResults(input, data) {
 
 async function getApiData(command, type, query, custom) {
   return type === "all"
-    ? Promise.all(
-        types.values[command]
-          .slice(1)
-          .map((type) => getApiData(command, type, query, custom))
-      )
-    : await fetch(
-        `${API_URI}/${type}/${command}/${query}${
-          custom ? "?custom=" + custom : ""
-        }`
-      ).then((res) => res.json());
+    ? Promise.all(types.values[command].slice(1).map((type) => getApiData(command, type, query, custom)))
+    : await fetch(`${API_URI}/${type}/${command}/${query}${custom ? "?custom=" + custom : ""}`).then((res) => {
+        if (!res.ok) {
+          throw new Error(`API request failed with status ${res.status}`);
+        }
+
+        return res.json();
+      });
 }
 
 export default async function search(command, type, query, custom) {

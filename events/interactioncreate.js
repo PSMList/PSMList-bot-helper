@@ -20,7 +20,7 @@ export async function execute(interaction) {
     await command.execute(interaction);
   } catch (error) {
     console.log(error);
-    await interaction.channel.send(
+    await interaction.reply(
       replyWithEmbeds({
         title: "Unexpected internal error",
         description: "Please try again later or contact the bot maintainers.",
