@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 // calculate hosted server offset with online time API
 let timeOffset = 0;
 function fetchTime() {
-  fetch("https://worldtimeapi.org/api/ip")
+  fetch("https://timeapi.io/api/time/current/zone?timeZone=Europe%2FParis")
     .then((res) => res.json())
     .then(({ datetime }) => {
       timeOffset = Date.now() - new Date(datetime);
@@ -13,7 +13,7 @@ function fetchTime() {
     });
 }
 fetchTime();
-setInterval(fetchTime, 2 * 3600 * 1000);
+setInterval(fetchTime, 24 * 3600 * 1000);
 
 export default function ping(createdTimestamp) {
   // calculate the time taken to process this message
