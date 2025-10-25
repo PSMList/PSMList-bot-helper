@@ -84,7 +84,7 @@ export function replyWithEmbeds(embeds) {
               "keyword",
               "event",
             ].reduce(
-              (output, type) => `${output} [${type}](https://psmlist.com/public/${type}/search)`,
+              (output, type) => `${output} [${type}](https://psmlist.com/public/${type}/search), `,
               ""
             )} search pages directly on [psmlist](https://psmlist.com/public/).`.replace(/^ */gm, ""),
       color: 0x428bca,

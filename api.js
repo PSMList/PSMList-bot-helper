@@ -18,6 +18,9 @@ pool.getConnection((err) => {
 
 function poolQuery(res, query, args) {
   return new Promise((resolve, reject) => {
+    // const _args = Array.isArray(args) ? args : args ? [args] : [];
+    // console.log(query.replace(/\?/, () => _args.shift()).replace(/\s+|\n/g, " "), _args);
+
     pool.query(query, args, (err, results, fields) => {
       if (!err) {
         resolve(results, fields);
@@ -166,7 +169,7 @@ ship.get("/name/:ship", (req, res) => {
     res,
     `SELECT ${selectColumns("ship")} FROM ${extendedItemsTable("ship")} WHERE ${customConditionFromRequest(
       req
-    )} AND i.idtype != 2 AND i.name LIKE ? ${sortByName};`,
+    )} AND i.name LIKE ? ${sortByName};`,
     formatExactRegex(shipName)
   );
 });
