@@ -9,6 +9,7 @@ const choiceTypes = [
   { name: "Crew", value: "crew" },
   { name: "Treasure", value: "treasure" },
   { name: "Equipment", value: "equipment" },
+  { name: "Event", value: "event" },
 ];
 
 const choiceIdTypes = [...choiceTypes, { name: "Island", value: "island" }];
@@ -16,10 +17,7 @@ const choiceIdTypes = [...choiceTypes, { name: "Island", value: "island" }];
 const choiceNameTypes = [...choiceTypes, { name: "Keyword", value: "keyword" }];
 
 const choiceTypesTitles = Object.fromEntries(
-  [...choiceIdTypes, ...choiceNameTypes].map((choice) => [
-    choice.value,
-    choice.name,
-  ])
+  [...choiceIdTypes, ...choiceNameTypes].map((choice) => [choice.value, choice.name])
 );
 
 export const types = {
@@ -60,9 +58,7 @@ function buildItemEmbed(type, data) {
 
   if (type === "keyword") {
     const item = data[0];
-    const url = `https://psmlist.com/public/keyword/detail?kw=${encodeURI(
-      item.shortname
-    )}`;
+    const url = `https://psmlist.com/public/keyword/detail?kw=${encodeURI(item.shortname)}`;
     embeds.push({
       title: item.shortname,
       url,
@@ -128,12 +124,7 @@ function buildItemEmbed(type, data) {
               " ** \u200b \u200b " +
               emojis.cannon +
               " " +
-              item.cannons
-                .match(/\w{2}/g)
-                .reduce(
-                  (cannons, cannon) => cannons + " \u200b " + emojis[cannon],
-                  ""
-                ),
+              item.cannons.match(/\w{2}/g).reduce((cannons, cannon) => cannons + " \u200b " + emojis[cannon], ""),
           });
         } else {
           fields.push({
@@ -166,12 +157,7 @@ function buildItemEmbed(type, data) {
               " \u200b \u200b " +
               emojis.cannon +
               " " +
-              item.cannons
-                .match(/\w{2}/g)
-                .reduce(
-                  (cannons, cannon) => cannons + " \u200b " + emojis[cannon],
-                  ""
-                ),
+              item.cannons.match(/\w{2}/g).reduce((cannons, cannon) => cannons + " \u200b " + emojis[cannon], ""),
           });
         }
         break;
@@ -192,20 +178,13 @@ function buildItemEmbed(type, data) {
         break;
       case "treasure":
       case "equipment":
+      case "event":
         itemEmbed.author = {
           name: capitalize(type),
         };
         fields.push({
-          name:
-            prefix +
-            " \u200b " +
-            extensionObject.name +
-            " \u200b - \u200b " +
-            extensionObject.short,
-          value:
-            type === "equipment"
-              ? "**" + plural("point", item.points) + " **"
-              : "",
+          name: prefix + " \u200b " + extensionObject.name + " \u200b - \u200b " + extensionObject.short,
+          value: type !== "treasure" ? "**" + plural("point", item.points) + " **" : "",
         });
         break;
       case "island":
@@ -218,27 +197,17 @@ function buildItemEmbed(type, data) {
         }/icon/${item.imageiconisland}`;
 
         fields.push({
-          name:
-            prefix +
-            " \u200b " +
-            extensionObject.name +
-            " \u200b - \u200b " +
-            extensionObject.short,
+          name: prefix + " \u200b " + extensionObject.name + " \u200b - \u200b " + extensionObject.short,
           value: truncateField(item.oncardtext, itemEmbed.url),
         });
 
-        const islandTerrains = [
-          item.island_terrain_id_1,
-          item.island_terrain_id_2,
-        ].filter(Boolean);
+        const islandTerrains = [item.island_terrain_id_1, item.island_terrain_id_2].filter(Boolean);
 
         if (islandTerrains.length) {
           const terrains = islandTerrains
             .map((terrainId) => {
               const terrain = dbData["island/terrain"][terrainId];
-              return `${emojis[terrain.nameimg]} [${terrain.name}](${
-                itemEmbed.url
-              })`;
+              return `${emojis[terrain.nameimg]} [${terrain.name}](${itemEmbed.url})`;
             })
             .join("\n");
           fields.push({ name: "Terrain", value: terrains });
@@ -246,10 +215,12 @@ function buildItemEmbed(type, data) {
         break;
     }
 
-    if (item.defaultaptitude) {
+    const ability = item.defaultaptitude || item.aptitude;
+
+    if (ability) {
       fields.push({
         name: "Ability",
-        value: truncateField(item.defaultaptitude, url),
+        value: truncateField(ability, url),
       });
     }
 
@@ -296,15 +267,11 @@ function buildItemsEmbed(type, items) {
         }
 
         const faction = dbData["faction"][item.faction];
-        const factionName = faction?.nameimg
-          ? ` \u200b ${emojis[faction.nameimg]}`
-          : "";
+        const factionName = faction?.nameimg ? ` \u200b ${emojis[faction.nameimg]}` : "";
 
         const itemName = item.name ? ` \u200b ${item.name}` : "";
 
-        const terrains =
-          type === "island" &&
-          [item.island_terrain_id_1, item.island_terrain_id_2].filter(Boolean);
+        const terrains = type === "island" && [item.island_terrain_id_1, item.island_terrain_id_2].filter(Boolean);
         let terrainName = "";
         if (terrains?.length) {
           terrainName = terrains
@@ -324,9 +291,7 @@ function buildItemsEmbed(type, items) {
       }, "");
     } else {
       output = items.slice(i, i + 8).reduce((accu, item) => {
-        const url = `https://psmlist.com/public/keyword/detail?kw=${encodeURI(
-          item.shortname
-        )}`;
+        const url = `https://psmlist.com/public/keyword/detail?kw=${encodeURI(item.shortname)}`;
         return `${accu}[${item.shortname}](${url})\n`;
       }, "");
     }

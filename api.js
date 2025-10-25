@@ -97,19 +97,18 @@ function customConditionFromRequest(req) {
 }
 
 function filterExtension(extensionShort) {
-  return "numid REGEXP ? " + extensionShort
-    ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?)"
-    : "";
+  return (
+    "numid REGEXP ? " +
+    (extensionShort
+      ? " AND idextension = (SELECT id FROM extension WHERE short = ? OR shortcommunity = ? OR shortwizkids = ?)"
+      : "")
+  );
 }
 
 function extendedItemsTable(type) {
   return `${type} as i
           LEFT JOIN extension as e ON e.id = i.idextension AND e.ispublic = 1
-          ${
-            type === "island"
-              ? "LEFT JOIN collectible_item as ci ON ci.id = i.id"
-              : ""
-          }`;
+          ${type === "island" ? "LEFT JOIN collectible_item as ci ON ci.id = i.id" : ""}`;
 }
 
 function allItemsQuery(type, req) {
@@ -148,16 +147,10 @@ ship.get("/id/:ship", (req, res) => {
 
   const numIdRegex = `^([a-zA-Z]+-)?${prefix ?? ""}0*${numID}g?$`;
 
-  const query = `SELECT ${selectColumns("ship")} FROM ${extendedItemsTable(
-    "ship"
-  )} WHERE ${customConditionFromRequest(req)} AND numid REGEXP ? ${
-    extensionShort
-      ? " AND (e.short = ? OR e.shortcommunity = ? OR e.shortwizkids = ?)"
-      : ""
-  } ${sortById};`;
-  const params = extensionShort
-    ? [extensionShort, extensionShort, extensionShort]
-    : [];
+  const query = `SELECT ${selectColumns("ship")} FROM ${extendedItemsTable("ship")} WHERE ${customConditionFromRequest(
+    req
+  )} AND ${filterExtension(extensionShort)} ${sortById};`;
+  const params = extensionShort ? [extensionShort, extensionShort, extensionShort] : [];
 
   poolQuery(res, query, [numIdRegex, ...params]);
 });
@@ -171,9 +164,7 @@ ship.get("/name/:ship", (req, res) => {
 
   poolQuery(
     res,
-    `SELECT ${selectColumns("ship")} FROM ${extendedItemsTable(
-      "ship"
-    )} WHERE ${customConditionFromRequest(
+    `SELECT ${selectColumns("ship")} FROM ${extendedItemsTable("ship")} WHERE ${customConditionFromRequest(
       req
     )} AND i.idtype != 2 AND i.name LIKE ? ${sortByName};`,
     formatExactRegex(shipName)
@@ -207,15 +198,11 @@ crew.get("/id/:crew", (req, res) => {
 
   const numIdRegex = `^([a-zA-Z]+-)?${prefix ?? ""}0*${numID}-?[abc]?$`;
 
-  const query = `SELECT ${selectColumns("crew")} FROM ${extendedItemsTable(
-    "crew"
-  )} WHERE ${customConditionFromRequest(req)} AND ${filterExtension(
-    extensionShort
-  )};`;
+  const query = `SELECT ${selectColumns("crew")} FROM ${extendedItemsTable("crew")} WHERE ${customConditionFromRequest(
+    req
+  )} AND ${filterExtension(extensionShort)};`;
 
-  const params = extensionShort
-    ? [extensionShort, extensionShort, extensionShort]
-    : [];
+  const params = extensionShort ? [extensionShort, extensionShort, extensionShort] : [];
 
   poolQuery(res, query, [numIdRegex, ...params]);
 });
@@ -229,9 +216,9 @@ crew.get("/name/:crew", (req, res) => {
 
   poolQuery(
     res,
-    `SELECT ${selectColumns("crew")} FROM ${extendedItemsTable(
-      "crew"
-    )} WHERE ${customConditionFromRequest(req)} AND i.name LIKE ?;`,
+    `SELECT ${selectColumns("crew")} FROM ${extendedItemsTable("crew")} WHERE ${customConditionFromRequest(
+      req
+    )} AND i.name LIKE ?;`,
     formatExactRegex(crewName)
   );
 });
@@ -265,13 +252,9 @@ treasure.get("/id/:treasure", (req, res) => {
 
   const query = `SELECT ${selectColumns("treasure")} FROM ${extendedItemsTable(
     "treasure"
-  )} WHERE ${customConditionFromRequest(req)} AND ${filterExtension(
-    extensionShort
-  )};`;
+  )} WHERE ${customConditionFromRequest(req)} AND ${filterExtension(extensionShort)};`;
 
-  const params = extensionShort
-    ? [extensionShort, extensionShort, extensionShort]
-    : [];
+  const params = extensionShort ? [extensionShort, extensionShort, extensionShort] : [];
 
   poolQuery(res, query, [numIdRegex, ...params]);
 });
@@ -285,9 +268,9 @@ treasure.get("/name/:treasure", (req, res) => {
 
   poolQuery(
     res,
-    `SELECT ${selectColumns("treasure")} FROM ${extendedItemsTable(
-      "treasure"
-    )} WHERE ${customConditionFromRequest(req)} AND i.name LIKE ?;`,
+    `SELECT ${selectColumns("treasure")} FROM ${extendedItemsTable("treasure")} WHERE ${customConditionFromRequest(
+      req
+    )} AND i.name LIKE ?;`,
     formatExactRegex(treasureName)
   );
 });
@@ -321,13 +304,9 @@ equipment.get("/id/:equipment", (req, res) => {
 
   const query = `SELECT ${selectColumns("equipment")} FROM ${extendedItemsTable(
     "equipment"
-  )} WHERE ${customConditionFromRequest(req)} AND ${filterExtension(
-    extensionShort
-  )};`;
+  )} WHERE ${customConditionFromRequest(req)} AND ${filterExtension(extensionShort)};`;
 
-  const params = extensionShort
-    ? [extensionShort, extensionShort, extensionShort]
-    : [];
+  const params = extensionShort ? [extensionShort, extensionShort, extensionShort] : [];
 
   poolQuery(res, query, [numIdRegex, ...params]);
 });
@@ -341,9 +320,9 @@ equipment.get("/name/:equipment", (req, res) => {
 
   poolQuery(
     res,
-    `SELECT ${selectColumns("equipment")} FROM ${extendedItemsTable(
-      "equipment"
-    )} WHERE ${customConditionFromRequest(req)} AND i.name LIKE ?;`,
+    `SELECT ${selectColumns("equipment")} FROM ${extendedItemsTable("equipment")} WHERE ${customConditionFromRequest(
+      req
+    )} AND i.name LIKE ?;`,
     formatExactRegex(equipmentName)
   );
 });
@@ -375,21 +354,16 @@ island.get("/id/:island", (req, res) => {
 
   const numIdRegex = `^${prefix ?? ""}0*${numID}i?$`;
 
-  const terrainQuery =
-    "SELECT island_terrain_id FROM island_island_terrain WHERE island_id = i.id LIMIT 1";
+  const terrainQuery = "SELECT island_terrain_id FROM island_island_terrain WHERE island_id = i.id LIMIT 1";
 
   const query = `SELECT ${selectColumns("island")},
     (SELECT name FROM image WHERE image.id = i.idimageiconisland) as imageiconisland,
     (${terrainQuery}) as island_terrain_id_1,
     (${terrainQuery} OFFSET 1) as island_terrain_id_2
     FROM ${extendedItemsTable("island")}
-    WHERE ${customConditionFromRequest(req)} AND ${filterExtension(
-    extensionShort
-  )};`;
+    WHERE ${customConditionFromRequest(req)} AND ${filterExtension(extensionShort)};`;
 
-  const params = extensionShort
-    ? [extensionShort, extensionShort, extensionShort]
-    : [];
+  const params = extensionShort ? [extensionShort, extensionShort, extensionShort] : [];
 
   poolQuery(res, query, [numIdRegex, ...params]);
 });
@@ -403,15 +377,51 @@ island.get("/terrain", (req, res) => {
  */
 
 event.get("/", (req, res) => {
-  res.json({ error: "Not implemented yet!" });
+  poolQuery(res, "SELECT * FROM event;");
 });
 
 event.get("/id/:event", (req, res) => {
-  res.json({ error: "Not implemented yet!" });
+  const eventID = req.params.event.toUpperCase();
+
+  if (eventID.length > 10) {
+    return res.json([]);
+  }
+
+  const parts = idSplitRegex.exec(eventID);
+
+  if (!parts) {
+    return res.json([]);
+  }
+
+  const extensionShort = parts[1],
+    prefix = parts[2],
+    numID = parts[3];
+
+  const numIdRegex = `^${prefix ?? ""}0*${numID}[ab]?$`;
+
+  const query = `SELECT ${selectColumns("event")} FROM ${extendedItemsTable(
+    "event"
+  )} WHERE ${customConditionFromRequest(req)} AND ${filterExtension(extensionShort)};`;
+
+  const params = extensionShort ? [extensionShort, extensionShort, extensionShort] : [];
+
+  poolQuery(res, query, [numIdRegex, ...params]);
 });
 
 event.get("/name/:event", (req, res) => {
-  res.json({ error: "Not implemented yet!" });
+  const eventName = req.params.event.toUpperCase();
+
+  if (eventName.length > 30) {
+    return res.json([]);
+  }
+
+  poolQuery(
+    res,
+    `SELECT ${selectColumns("event")} FROM ${extendedItemsTable("event")} WHERE ${customConditionFromRequest(
+      req
+    )} AND i.name LIKE ?;`,
+    formatExactRegex(eventName)
+  );
 });
 
 /*
@@ -433,11 +443,7 @@ keyword.get("/name/:keyword", (req, res) => {
     return res.json([]);
   }
 
-  poolQuery(
-    res,
-    "SELECT * FROM keyword WHERE shortname LIKE ?;",
-    formatExactRegex(keywordName)
-  );
+  poolQuery(res, "SELECT * FROM keyword WHERE shortname LIKE ?;", formatExactRegex(keywordName));
 });
 
 keyword.get("/category", (req, res) => {
@@ -455,10 +461,7 @@ keyword.get("/target", (req, res) => {
 api.get("/faction", (req, res) => {
   poolQuery(
     res,
-    `SELECT * FROM faction as e WHERE ${customConditionFromRequest(req).replace(
-      "e.ispublic = 1",
-      "1 = 1"
-    )};`
+    `SELECT * FROM faction as e WHERE ${customConditionFromRequest(req).replace("e.ispublic = 1", "1 = 1")};`
   );
 });
 
@@ -515,6 +518,10 @@ api.get("/shiptype", (req, res) => {
 api.get("*", (req, res) => {
   res.status(404).json({});
 });
+
+/*
+ * Run server
+ */
 
 app.listen(API_PORT, () => {
   console.log(`API is running on port ${API_PORT}`);

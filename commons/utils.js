@@ -19,13 +19,7 @@ function isValidEmbed(data) {
   if ((data.author?.name?.length ?? 0) > 256) return false;
   if (Array.isArray(data.fields)) {
     if (data.fields.length > 25) return false;
-    if (
-      data.fields.some(
-        (field) =>
-          (field.name?.length ?? 0) > 256 || (field.value.length ?? 0) > 1024
-      )
-    )
-      return false;
+    if (data.fields.some((field) => (field.name?.length ?? 0) > 256 || (field.value.length ?? 0) > 1024)) return false;
   }
   if (embedLength(data) > 6000) return false;
 
@@ -54,12 +48,8 @@ export function replyWithEmbeds(embeds) {
       embeds[index] = cutStringBeforeNewLine(biggestEmbed, 3000);
     }
     if (typeof biggestEmbed === "object") {
-      if (
-        biggestEmbed.hasOwnProperty("description") &&
-        biggestEmbed.description.length > 3000
-      ) {
-        biggestEmbed.description =
-          StringBeforeNewLine(biggestEmbed.description, 3000) + "...";
+      if (biggestEmbed.hasOwnProperty("description") && biggestEmbed.description.length > 3000) {
+        biggestEmbed.description = StringBeforeNewLine(biggestEmbed.description, 3000) + "...";
       }
       if (biggestEmbed.hasOwnProperty("fields")) {
         let removedResultsTotalCount = 0;
@@ -70,8 +60,7 @@ export function replyWithEmbeds(embeds) {
             removedField = biggestEmbed.fields.pop();
             biggestEmbed.fields.push(customDisclaimerField);
           }
-          const removedResultsCount = (removedField.value.match(/\n/gm) || [])
-            .length;
+          const removedResultsCount = (removedField.value.match(/\n/gm) || []).length;
           removedResultsTotalCount += removedResultsCount;
         }
         biggestEmbed.fields.push({
@@ -83,14 +72,21 @@ export function replyWithEmbeds(embeds) {
     }
     embeds.splice(embeds.indexOf(biggestEmbed) + 1, 0, {
       title: "Truncated result",
-      description:
-        `This result contains too many lines for Discord to allow displaying everything.
+      description: `This result contains too many lines for Discord to allow displaying everything.
             Please consider selecting more accurate search terms.
-            
-            In the case you want everything, You can use the [ship](https://psmlist.com/public/ship/search), [crew](https://psmlist.com/public/crew/search), [treasure](https://psmlist.com/public/treasure/search), [equipment](https://psmlist.com/public/equipment/search), [island](https://psmlist.com/public/island/search) search pages directly on [psmlist](https://psmlist.com/public/).`.replace(
-          /^ */gm,
-          ""
-        ),
+
+            In the case you want everything, You can use the ${[
+              "ship",
+              "crew",
+              "treasure",
+              "equipment",
+              "island",
+              "keyword",
+              "event",
+            ].reduce(
+              (output, type) => `${output} [${type}](https://psmlist.com/public/${type}/search)`,
+              ""
+            )} search pages directly on [psmlist](https://psmlist.com/public/).`.replace(/^ */gm, ""),
       color: 0x428bca,
     });
   }
