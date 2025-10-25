@@ -8,6 +8,8 @@ export const tablesTitleMap = {
   "keyword/category": "Keyword categories",
   "keyword/target": "Keyword targets",
   "island/terrain": "Island terrains",
+  technicalshape: "Technical shapes",
+  shiptype: "Ship types",
 };
 
 export const tables = Object.keys(tablesTitleMap);
@@ -33,14 +35,7 @@ async function loadData(type) {
       }
       break;
     case "extension":
-      for (let {
-        id,
-        name,
-        short,
-        shortcommunity,
-        shortwizkids,
-        custom,
-      } of data) {
+      for (let { id, name, short, shortcommunity, shortwizkids, custom } of data) {
         if (id && name && short) {
           exports[id] = { name, short, shortcommunity, shortwizkids, custom };
         }
@@ -65,15 +60,7 @@ async function loadData(type) {
       }
       break;
     case "island/terrain":
-      for (let {
-        id,
-        name,
-        nameimg,
-        slugname,
-        imageiconisland,
-        island_terrain_id_1,
-        island_terrain_id_2,
-      } of data) {
+      for (let { id, name, nameimg, slugname, imageiconisland, island_terrain_id_1, island_terrain_id_2 } of data) {
         if (id && name) {
           exports[id] = {
             name,
@@ -86,6 +73,12 @@ async function loadData(type) {
         }
       }
       break;
+    case "shiptype":
+      for (let { id, defaultname } of data) {
+        if (id && defaultname) {
+          exports[id] = { name: defaultname };
+        }
+      }
   }
 
   return exports;
@@ -98,14 +91,12 @@ export default dbData;
 export let dbDataPromise;
 
 function setData() {
-  dbDataPromise = Promise.all(tables.map((table) => loadData(table))).then(
-    (results) => {
-      results.forEach((data, index) => {
-        const table = tables[index];
-        dbData[table] = data;
-      });
-    }
-  );
+  dbDataPromise = Promise.all(tables.map((table) => loadData(table))).then((results) => {
+    results.forEach((data, index) => {
+      const table = tables[index];
+      dbData[table] = data;
+    });
+  });
 }
 
 setData();

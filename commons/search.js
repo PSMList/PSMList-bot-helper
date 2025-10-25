@@ -53,6 +53,14 @@ function plural(string, number) {
   return prefix + string + "s";
 }
 
+function getType(item, type) {
+  if (type !== "ship") {
+    return type;
+  }
+
+  return dbData["shiptype"][item.idtype]?.name.toLowerCase() || "ship";
+}
+
 function buildItemEmbed(type, data) {
   const embeds = [];
 
@@ -90,10 +98,14 @@ function buildItemEmbed(type, data) {
     const url = `https://psmlist.com/public/${type}/${itemID}`;
 
     const customPrefix = item.custom ? "\\* \u200b" : "";
+    const customType = item.custom ? "Custom " : "";
     const extensionEmoji = emojis[extensionObject.short] || emojis["psmlist"];
     const prefix = customPrefix + extensionEmoji;
 
     const itemEmbed = {
+      author: {
+        name: customType + capitalize(getType(item, type)),
+      },
       title: `${item.name} (${itemID})`,
       color: parseInt(dbData["rarity"][item.idrarity]?.colorhex, 16),
       url,
@@ -179,9 +191,6 @@ function buildItemEmbed(type, data) {
       case "treasure":
       case "equipment":
       case "event":
-        itemEmbed.author = {
-          name: capitalize(type),
-        };
         fields.push({
           name: prefix + " \u200b " + extensionObject.name + " \u200b - \u200b " + extensionObject.short,
           value: type !== "treasure" ? "**" + plural("point", item.points) + " **" : "",
