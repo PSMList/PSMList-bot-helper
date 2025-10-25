@@ -345,12 +345,17 @@ function buildItemsEmbed(type, items) {
   ];
 }
 
+/**
+ *
+ * @param {string} input
+ * @param {object[] | object[][]} data
+ * @returns
+ */
 function setResults(input, data) {
+  const allData = data.flat();
+
   // get the amount of items to display
-  const itemsCount =
-    input === "all"
-      ? data.reduce((total, items) => total + items.length, 0)
-      : data.length;
+  const itemsCount = allData.length;
 
   if (!itemsCount) {
     const type = choiceTypesTitles[input] ?? "";
@@ -358,9 +363,7 @@ function setResults(input, data) {
     return [
       {
         title: "No data match",
-        description: `Provided input did not match any ${
-          input === "all" ? "type" : type.toLowerCase()
-        }.`,
+        description: `Provided input did not match any ${input === "all" ? "type" : type.toLowerCase()}.`,
       },
     ];
   }
@@ -368,10 +371,12 @@ function setResults(input, data) {
   // create an associative array of data by item type
   const dataByType = {};
   let typesCount = 0;
+
   if (input === "all") {
     for (let typeID = 0; typeID < data.length; typeID++) {
       const array = data[typeID];
       const type = types.values.name[typeID + 1];
+
       // avoid creating an empty embed if there is no value for this item type
       if (array.length > 0) {
         dataByType[type] = array;
@@ -385,45 +390,50 @@ function setResults(input, data) {
 
   const extensions = dbData["extension"];
 
-  const crew = dataByType["crew"];
-  const firstCrew = crew?.[0];
-  const secondCrew = crew?.[1];
+  let isSingleEmbed = itemsCount < 2;
 
-  const ships = dataByType["ship"];
-  const firstShip = ships?.[0];
-  const secondShip = ships?.[1];
-  const firstShipExtension = extensions[firstShip?.idextension];
-  const secondShipExtension = extensions[secondShip?.idextension];
+  if (itemsCount === 2) {
+    const firstItem = allData[0];
+    const secondItem = allData[1];
+    const firstItemExtension = extensions[firstItem.idextension].short;
+    const secondItemExtension = extensions[secondItem.idextension].short;
 
-  // check if there would be one item to show or two corresponding to crew from the same card (with same extension and numid)
-  const isSingleEmbed =
-    // more than one type or more than two items means multi embed
-    typesCount > 1 || itemsCount > 2
-      ? false
-      : // one item or two which match type specific conditions
-        itemsCount === 1 ||
-        // crew from the same card
-        (crew &&
-          firstCrew.idextension === secondCrew.idextension &&
-          firstCrew.numid.match(/^[^a]+/)[0] ===
-            secondCrew.numid.match(/^[^b]+/)[0]) ||
-        // ships from both non Unlimited and Unlimited extensions
-        (ships &&
-          firstShipExtension.short.match(/[^U]+/)[0] ===
-            secondShipExtension.short.match(/[^U]+/)[0]);
+    // If both items are from the same extension, we can show them together
+    if (
+      firstItemExtension === secondItemExtension &&
+      firstItem.numid.replace(/[ab]$/i, "") === secondItem.numid.replace(/[ab]$/i, "")
+    ) {
+      isSingleEmbed = true;
+    }
+    // If both items are the same except for Unlimited extension, we can show them together
+    else if (firstItemExtension.replace(/U$/i, "") === secondItemExtension.replace(/U$/i, "")) {
+      isSingleEmbed = true;
 
-  // keep only the ship not from Unlimited extension
-  if (isSingleEmbed && (ships?.length ?? 0) === 2) {
-    dataByType["ship"] = [
-      !firstShipExtension.short.endsWith("U") ? firstShip : secondShip,
-    ];
+      if (firstItemExtension.endsWith("U")) {
+        for (let type in dataByType) {
+          if (dataByType[type].find((item) => item === firstItem)) {
+            dataByType[type].pop();
+
+            break;
+          }
+        }
+      } else {
+        for (let type in dataByType) {
+          if (dataByType[type].find((item) => item === secondItem)) {
+            dataByType[type].shift();
+
+            break;
+          }
+        }
+      }
+    }
   }
 
   // create one embed for each type of item
   const embeds = [];
   for (let type in dataByType) {
     const array = dataByType[type];
-    // if data contains only one item or two successive crew
+
     embeds.push(
       ...(isSingleEmbed
         ? // create detailed embed
