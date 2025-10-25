@@ -13,9 +13,9 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
-    "discord.js": "^14.16.3",
-    "express": "^4.21.1",
-    "mysql2": "^3.11.3",
+    "discord.js": "^14.24.0",
+    "express": "^4.21.2",
+    "mysql2": "^3.15.3",
     "node-fetch": "^3.3.2"
   }
 }
