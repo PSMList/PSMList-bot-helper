@@ -77,9 +77,19 @@ function formatExactRegex(regex) {
 }
 
 const checkIfNotCustom = "e.custom = 0";
-const idSplitRegex = new RegExp(/^([A-Z]+)?([A-Z]+-)?(\d+-?[ABCGI]?)$/);
+const idSplitRegex = new RegExp(/^([A-Z]{2,3}?)?((?:[A-Z]{1,2}-)|(?:P|[A-Z]{2,3}))?(\d+-?(?:[A-Z]|-[A-Z]{2})?)$/);
 const sortById = "ORDER BY e.searchsort, i.numid";
 const sortByName = "ORDER BY i.name, e.searchsort, i.numid";
+
+function getIdParts(id) {
+  const [match, extensionShort, prefix, numID] = idSplitRegex.exec(id.toUpperCase()) ?? [];
+
+  if (!match) {
+    return null;
+  }
+
+  return [extensionShort, `^${prefix ?? ""}0*${numID}`];
+}
 
 function selectColumns(type) {
   return `i.*, e.custom${type === "island" ? ", ci.slugname" : ""}`;
@@ -138,20 +148,16 @@ ship.get("/id/:ship", (req, res) => {
     return res.json([]);
   }
 
-  const parts = idSplitRegex.exec(shipID);
+  const parts = getIdParts(shipID);
 
   if (!parts) {
     return res.json([]);
   }
 
-  const extensionShort = parts[1],
-    prefix = parts[2],
-    numID = parts[3];
-
-  const numIdRegex = `^([a-zA-Z]+-)?${prefix ?? ""}0*${numID}g?$`;
+  const [extensionShort, numIdRegex] = parts;
 
   const query = `SELECT ${selectColumns("ship")} FROM ${extendedItemsTable("ship")} WHERE ${customConditionFromRequest(
-    req
+    req,
   )} AND ${filterExtension(extensionShort)} ${sortById};`;
   const params = extensionShort ? [extensionShort, extensionShort, extensionShort] : [];
 
@@ -168,9 +174,9 @@ ship.get("/name/:ship", (req, res) => {
   poolQuery(
     res,
     `SELECT ${selectColumns("ship")} FROM ${extendedItemsTable("ship")} WHERE ${customConditionFromRequest(
-      req
+      req,
     )} AND i.name LIKE ? ${sortByName};`,
-    formatExactRegex(shipName)
+    formatExactRegex(shipName),
   );
 });
 
@@ -189,20 +195,16 @@ crew.get("/id/:crew", (req, res) => {
     return res.json([]);
   }
 
-  const parts = idSplitRegex.exec(crewID);
+  const parts = getIdParts(crewID);
 
   if (!parts) {
     return res.json([]);
   }
 
-  const extensionShort = parts[1],
-    prefix = parts[2],
-    numID = parts[3];
-
-  const numIdRegex = `^([a-zA-Z]+-)?${prefix ?? ""}0*${numID}-?[abc]?$`;
+  const [extensionShort, numIdRegex] = parts;
 
   const query = `SELECT ${selectColumns("crew")} FROM ${extendedItemsTable("crew")} WHERE ${customConditionFromRequest(
-    req
+    req,
   )} AND ${filterExtension(extensionShort)};`;
 
   const params = extensionShort ? [extensionShort, extensionShort, extensionShort] : [];
@@ -220,9 +222,9 @@ crew.get("/name/:crew", (req, res) => {
   poolQuery(
     res,
     `SELECT ${selectColumns("crew")} FROM ${extendedItemsTable("crew")} WHERE ${customConditionFromRequest(
-      req
+      req,
     )} AND i.name LIKE ?;`,
-    formatExactRegex(crewName)
+    formatExactRegex(crewName),
   );
 });
 
@@ -241,20 +243,16 @@ treasure.get("/id/:treasure", (req, res) => {
     return res.json([]);
   }
 
-  const parts = idSplitRegex.exec(treasureID);
+  const parts = getIdParts(treasureID);
 
   if (!parts) {
     return res.json([]);
   }
 
-  const extensionShort = parts[1],
-    prefix = parts[2],
-    numID = parts[3];
-
-  const numIdRegex = `^${prefix ?? ""}0*${numID}[bg]?$`;
+  const [extensionShort, numIdRegex] = parts;
 
   const query = `SELECT ${selectColumns("treasure")} FROM ${extendedItemsTable(
-    "treasure"
+    "treasure",
   )} WHERE ${customConditionFromRequest(req)} AND ${filterExtension(extensionShort)};`;
 
   const params = extensionShort ? [extensionShort, extensionShort, extensionShort] : [];
@@ -272,9 +270,9 @@ treasure.get("/name/:treasure", (req, res) => {
   poolQuery(
     res,
     `SELECT ${selectColumns("treasure")} FROM ${extendedItemsTable("treasure")} WHERE ${customConditionFromRequest(
-      req
+      req,
     )} AND i.name LIKE ?;`,
-    formatExactRegex(treasureName)
+    formatExactRegex(treasureName),
   );
 });
 
@@ -293,20 +291,16 @@ equipment.get("/id/:equipment", (req, res) => {
     return res.json([]);
   }
 
-  const parts = idSplitRegex.exec(equipmentID);
+  const parts = getIdParts(equipmentID);
 
   if (!parts) {
     return res.json([]);
   }
 
-  const extensionShort = parts[1],
-    prefix = parts[2],
-    numID = parts[3];
-
-  const numIdRegex = `^${prefix ?? ""}0*${numID}a?$`;
+  const [extensionShort, numIdRegex] = parts;
 
   const query = `SELECT ${selectColumns("equipment")} FROM ${extendedItemsTable(
-    "equipment"
+    "equipment",
   )} WHERE ${customConditionFromRequest(req)} AND ${filterExtension(extensionShort)};`;
 
   const params = extensionShort ? [extensionShort, extensionShort, extensionShort] : [];
@@ -324,9 +318,9 @@ equipment.get("/name/:equipment", (req, res) => {
   poolQuery(
     res,
     `SELECT ${selectColumns("equipment")} FROM ${extendedItemsTable("equipment")} WHERE ${customConditionFromRequest(
-      req
+      req,
     )} AND i.name LIKE ?;`,
-    formatExactRegex(equipmentName)
+    formatExactRegex(equipmentName),
   );
 });
 
@@ -345,17 +339,13 @@ island.get("/id/:island", (req, res) => {
     return res.json([]);
   }
 
-  const parts = idSplitRegex.exec(islandID);
+  const parts = getIdParts(islandID);
 
   if (!parts) {
     return res.json([]);
   }
 
-  const extensionShort = parts[1],
-    prefix = parts[2],
-    numID = parts[3];
-
-  const numIdRegex = `^${prefix ?? ""}0*${numID}i?$`;
+  const [extensionShort, numIdRegex] = parts;
 
   const terrainQuery = "SELECT island_terrain_id FROM island_island_terrain WHERE island_id = i.id LIMIT 1";
 
@@ -390,20 +380,16 @@ event.get("/id/:event", (req, res) => {
     return res.json([]);
   }
 
-  const parts = idSplitRegex.exec(eventID);
+  const parts = getIdParts(eventID);
 
   if (!parts) {
     return res.json([]);
   }
 
-  const extensionShort = parts[1],
-    prefix = parts[2],
-    numID = parts[3];
-
-  const numIdRegex = `^${prefix ?? ""}0*${numID}[ab]?$`;
+  const [extensionShort, numIdRegex] = parts;
 
   const query = `SELECT ${selectColumns("event")} FROM ${extendedItemsTable(
-    "event"
+    "event",
   )} WHERE ${customConditionFromRequest(req)} AND ${filterExtension(extensionShort)};`;
 
   const params = extensionShort ? [extensionShort, extensionShort, extensionShort] : [];
@@ -421,9 +407,9 @@ event.get("/name/:event", (req, res) => {
   poolQuery(
     res,
     `SELECT ${selectColumns("event")} FROM ${extendedItemsTable("event")} WHERE ${customConditionFromRequest(
-      req
+      req,
     )} AND i.name LIKE ?;`,
-    formatExactRegex(eventName)
+    formatExactRegex(eventName),
   );
 });
 
@@ -464,7 +450,7 @@ keyword.get("/target", (req, res) => {
 api.get("/faction", (req, res) => {
   poolQuery(
     res,
-    `SELECT * FROM faction as e WHERE ${customConditionFromRequest(req).replace("e.ispublic = 1", "1 = 1")};`
+    `SELECT * FROM faction as e WHERE ${customConditionFromRequest(req).replace("e.ispublic = 1", "1 = 1")};`,
   );
 });
 
@@ -486,7 +472,7 @@ api.get("/extension", (req, res) => {
       ${iconsSelect}
       FROM extension as e
       WHERE ${customConditionFromRequest(req)}
-      AND e.ispublic = 1;`.replace(/^ */gm, "")
+      AND e.ispublic = 1;`.replace(/^ */gm, ""),
   );
 });
 
@@ -534,5 +520,5 @@ process.on("exit", () =>
   pool.end((err) => {
     // all connections in the pool have ended
     console.trace(err);
-  })
+  }),
 );
